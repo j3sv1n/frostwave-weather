@@ -1,4 +1,4 @@
-# Frostwave ☁️🎵
+# Frostwave Weather ☁️🎵
 
 Frostwave is a sleek, modern weather web app that delivers real-time weather updates with AI-generated summaries and an integrated music experience. Designed with an elegant UI using **shadcn/ui** and **Aceternity UI**, it offers a seamless experience for users who want both weather insights and background music.
 
