@@ -166,255 +166,259 @@ function App() {
   };
 
   return (
-    <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col h-screen">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
-          <ThemeToggle />
-        </div>
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 text-lg text-zinc-400">
-          <Navigation className="w-5 h-5 text-zinc-400" />
-          <AnimatePresence mode="wait">
-            {weather?.location?.name && (
-              <motion.p
-                key={weather.location.name} // Trigger animation on location change
-                initial={{ opacity: 0, y: -10 }} // Start animation
-                animate={{ opacity: 1, y: 0 }} // End animation
-                exit={{ opacity: 0, y: 10 }} // Exit animation
-                transition={{ duration: 0.5 }} // Animation duration
-              >
-                {weather.location.name}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <div className="relative">
-              <Input
-                ref={inputRef}
-                type="text"
-                value={location}
-                onFocus={() => setSearchResults([])}
-                onChange={(e) => {
-                  const query = e.target.value;
-                  setLocation(query);
-                  debouncedFetchSearchResults(query);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && searchResults.length > 0) {
-                    fetchWeather(searchResults[0].name);
-                  }
-                }}
-                placeholder="Search..."
-                className="pr-10"
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-                onClick={() => {
-                  if (searchResults.length > 0) {
-                    fetchWeather(searchResults[0].name);
-                  }
-                }}
-              >
-                <Search className="w-5 h-5 text-zinc-400" />
-              </div>
+    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
+      <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col h-screen">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
+            <div className="pt-2">
+              <ThemeToggle />
             </div>
-          </PopoverTrigger>
-          <PopoverContent
-            className="max-w-none"
-            style={{
-              width: inputRef.current ? `${inputRef.current.offsetWidth}px` : "300px",
-            }}
-          >
+          </div>
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 text-lg text-zinc-400">
+            <Navigation className="w-5 h-5 text-zinc-400" />
+            <AnimatePresence mode="wait">
+              {weather?.location?.name && (
+                <motion.p
+                  key={weather.location.name} // Trigger animation on location change
+                  initial={{ opacity: 0, y: -10 }} // Start animation
+                  animate={{ opacity: 1, y: 0 }} // End animation
+                  exit={{ opacity: 0, y: 10 }} // Exit animation
+                  transition={{ duration: 0.5 }} // Animation duration
+                >
+                  {weather.location.name}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
 
-            {searchResults.length > 0 ? (
-              searchResults.map((result) => (
-                <div
-                  key={result.id}
-                  className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    fetchWeather(result.name);
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className="relative">
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  value={location}
+                  onFocus={() => setSearchResults([])}
+                  onChange={(e) => {
+                    const query = e.target.value;
+                    setLocation(query);
+                    debouncedFetchSearchResults(query);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && searchResults.length > 0) {
+                      fetchWeather(searchResults[0].name);
+                    }
+                  }}
+                  placeholder="Search..."
+                  className="pr-10"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+                  onClick={() => {
+                    if (searchResults.length > 0) {
+                      fetchWeather(searchResults[0].name);
+                    }
                   }}
                 >
-                  <span>
-                    {result.name}, {result.region}
-                  </span>
-                  <button
-                    className="ml-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(result.name);
-                    }}
-                  >
-                    {favorites.includes(result.name) ? (
-                      <Heart
-                        className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
-                        fill="currentColor" 
-                      />
-                    ) : (
-                      <Heart
-                        className="w-5 h-5 text-zinc-400 transition-transform duration-300 hover:scale-110"
-                      />
-                    )}
-                  </button>
+                  <Search className="w-5 h-5 text-zinc-400" />
                 </div>
-              ))
-            ) : (
-              <p className="p-3 text-zinc-400">
-                {location.trim() === "" ? "Start typing to search..." : "No results found"}
-              </p>
-            )}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent
+              className="max-w-none"
+              style={{
+                width: inputRef.current ? `${inputRef.current.offsetWidth}px` : "300px",
+              }}
+            >
 
-            {favorites.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-zinc-400 text-sm mb-2">Favorites</h4>
-                {favorites.map((fav, index) => (
+              {searchResults.length > 0 ? (
+                searchResults.map((result) => (
                   <div
-                    key={index}
+                    key={result.id}
                     className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      fetchWeather(fav);
+                      fetchWeather(result.name);
                     }}
                   >
-                    <span>{fav}</span>
+                    <span>
+                      {result.name}, {result.region}
+                    </span>
                     <button
                       className="ml-2"
-                      onClick={(e) => {
+                      onMouseDown={(e) => {
                         e.stopPropagation();
-                        toggleFavorite(fav);
+                        toggleFavorite(result.name);
                       }}
                     >
-                      <Heart
-                        className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
-                        fill="currentColor" 
-                      />
+                      {favorites.includes(result.name) ? (
+                        <Heart
+                          className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
+                          fill="currentColor"
+                        />
+                      ) : (
+                        <Heart
+                          className="w-5 h-5 text-zinc-400 transition-transform duration-300 hover:scale-110"
+                        />
+                      )}
                     </button>
                   </div>
-                ))}
-              </div>
-            )}
-
-            <div
-              className="cursor-pointer flex items-center p-3 hover:bg-zinc-800 rounded mt-2"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                console.log("Current Location button clicked"); // Debugging log
-                getUserLocation(); // Call the function
-              }}
-            >
-              <Navigation className="w-5 h-5 text-zinc-400 mr-2" />
-              <span>Current Location</span>
-            </div>
-          </PopoverContent>
-         </Popover>
-      </div>
-  
-      <div className="flex-1 flex flex-col justify-center items-center" style={{ minHeight: "300px" }}>
-        <AnimatePresence mode="wait">
-          {weather ? (
-            <motion.div
-              key={weather.location.name} // Trigger animation on location change
-              initial={{ opacity: 0, y: 20 }} // Start animation
-              animate={{ opacity: 1, y: 0 }} // End animation
-              exit={{ opacity: 0, y: -20 }} // Exit animation
-              transition={{ duration: 0.5 }} // Animation duration
-              className="flex items-center space-x-6"
-            >
-              <img
-                src={sunLogo}
-                className="w-56 h-56 object-contain drop-shadow-lg transition-transform duration-300 hover:scale-110 hover:drop-shadow-glow"
-                alt="Weather Icon"
-              />
-              <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:scale-110 hover:drop-shadow-glow">
-                {Math.round(
-                  weather.current.temp_c % 1 < 0.6
-                    ? Math.floor(weather.current.temp_c)
-                    : Math.ceil(weather.current.temp_c)
-                )}
-                °C
-              </p>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center space-x-6"
-            >
-              <Skeleton className="w-56 h-56 rounded-full" />
-              <Skeleton className="w-40 h-20 rounded" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-  
-      <div className="flex flex-row w-full mt-auto">
-        <Card className="flex-1 p-4 bg-zinc-900 text-zinc-100 text-center mr-4 h-[250px] transition-transform duration-30 hover:scale-110">
-          <CardContent>
-            {aiSummary ? (
-              <p
-                className="text-lg italic pt-2"
-                style={{ textAlign: "justify" }}
-              >
-                {aiSummary}
-              </p>
-            ) : (
-              <Skeleton className="w-full h-20 rounded pt-2" />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="flex-1 p-4 bg-zinc-900 text-zinc-100 h-[250px] transition-transform duration-30 hover:scale-110">
-          <CardContent>
-            <h3 className="text-xl font-semibold mb-2">3-Day Forecast</h3>
-            <AnimatePresence mode="wait">
-              {weather?.forecast?.forecastday ? (
-                <motion.div
-                  key={weather.forecast.forecastday.map((day) => day.date).join(",")} // Trigger animation on forecast change
-                  initial={{ opacity: 0, y: 10 }} // Start animation
-                  animate={{ opacity: 1, y: 0 }} // End animation
-                  exit={{ opacity: 0, y: -10 }} // Exit animation
-                  transition={{ duration: 0.5 }} // Animation duration
-                >
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Day</TableHead>
-                        <TableHead>Temp (°C)</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {weather.forecast.forecastday.map((day) => (
-                        <TableRow key={day.date}>
-                          <TableCell>
-                            {new Date(day.date).toLocaleDateString("en-US", {
-                              weekday: "short",
-                            })}
-                          </TableCell>
-                          <TableCell className="flex items-center space-x-2">
-                            <img src={sunLogo} className="w-8 h-8" alt="Weather Icon" />
-                            <span>{day.day.avgtemp_c}°C</span>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </motion.div>
+                ))
               ) : (
-                <div className="space-y-2">
-                  <Skeleton className="w-full h-8 rounded" />
-                  <Skeleton className="w-full h-8 rounded" />
-                  <Skeleton className="w-full h-8 rounded" />
+                <p className="p-3 text-zinc-400">
+                  {location.trim() === "" ? "Start typing to search..." : "No results found"}
+                </p>
+              )}
+
+              {favorites.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-zinc-400 text-sm mb-2">Favorites</h4>
+                  {favorites.map((fav, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        fetchWeather(fav);
+                      }}
+                    >
+                      <span>{fav}</span>
+                      <button
+                        className="ml-2"
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(fav);
+                        }}
+                      >
+                        <Heart
+                          className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
+                          fill="currentColor"
+                        />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
-            </AnimatePresence>
-          </CardContent>
-        </Card>
+
+              <div
+                className="cursor-pointer flex items-center p-3 hover:bg-zinc-800 rounded mt-2"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  console.log("Current Location button clicked");
+                  getUserLocation();
+                }}
+              >
+                <Navigation className="w-5 h-5 text-zinc-400 mr-2" />
+                <span>Current Location</span>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+    
+        <div className="flex-1 flex flex-col justify-center items-center" style={{ minHeight: "300px" }}>
+          <AnimatePresence mode="wait">
+            {weather ? (
+              <motion.div
+                key={weather.location.name} // Trigger animation on location change
+                initial={{ opacity: 0, y: 20 }} // Start animation
+                animate={{ opacity: 1, y: 0 }} // End animation
+                exit={{ opacity: 0, y: -20 }} // Exit animation
+                transition={{ duration: 0.5 }} // Animation duration
+                className="flex items-center space-x-6"
+              >
+                <img
+                  src={sunLogo}
+                  className="w-56 h-56 object-contain drop-shadow-lg transition-transform duration-300 hover:scale-110 hover:drop-shadow-glow"
+                  alt="Weather Icon"
+                />
+                <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:scale-110 hover:drop-shadow-glow">
+                  {Math.round(
+                    weather.current.temp_c % 1 < 0.6
+                      ? Math.floor(weather.current.temp_c)
+                      : Math.ceil(weather.current.temp_c)
+                  )}
+                  °C
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center space-x-6"
+              >
+                <Skeleton className="w-56 h-56 rounded-full" />
+                <Skeleton className="w-40 h-20 rounded" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+    
+        <div className="flex flex-row w-full mt-auto" style={{ gap: "0.3rem" }}>
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-center mr-4 h-[250px] transition-transform duration-30 hover:scale-110">
+            <CardContent>
+              {aiSummary ? (
+                <p
+                  className="text-lg italic pt-2"
+                  style={{ textAlign: "justify" }}
+                >
+                  {aiSummary}
+                </p>
+              ) : (
+                <Skeleton className="w-full h-20 rounded pt-2" />
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 h-[250px] transition-transform duration-30 hover:scale-110">
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-2">3-Day Forecast</h3>
+              <AnimatePresence mode="wait">
+                {weather?.forecast?.forecastday ? (
+                  <motion.div
+                    key={weather.forecast.forecastday.map((day) => day.date).join(",")} // Trigger animation on forecast change
+                    initial={{ opacity: 0, y: 10 }} // Start animation
+                    animate={{ opacity: 1, y: 0 }} // End animation
+                    exit={{ opacity: 0, y: -10 }} // Exit animation
+                    transition={{ duration: 0.5 }} // Animation duration
+                  >
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Day</TableHead>
+                          <TableHead>Temp (°C)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {weather.forecast.forecastday.map((day) => (
+                          <TableRow key={day.date}>
+                            <TableCell>
+                              {new Date(day.date).toLocaleDateString("en-US", {
+                                weekday: "short",
+                              })}
+                            </TableCell>
+                            <TableCell className="flex items-center space-x-2">
+                              <img src={sunLogo} className="w-8 h-8" alt="Weather Icon" />
+                              <span>{day.day.avgtemp_c}°C</span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </motion.div>
+                ) : (
+                  <div className="space-y-2">
+                    <Skeleton className="w-full h-8 rounded" />
+                    <Skeleton className="w-full h-8 rounded" />
+                    <Skeleton className="w-full h-8 rounded" />
+                  </div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
