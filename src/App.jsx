@@ -354,7 +354,7 @@ function App() {
       </div>
   
       <div className="flex flex-row w-full mt-auto">
-        <Card className="flex-1 p-4 bg-zinc-900 text-zinc-100 text-center mr-4 h-[250px]">
+        <Card className="flex-1 p-4 bg-zinc-900 text-zinc-100 text-center mr-4 h-[250px] transition-transform duration-30 hover:scale-110">
           <CardContent>
             {aiSummary ? (
               <p
@@ -369,7 +369,7 @@ function App() {
           </CardContent>
         </Card>
 
-        <Card className="flex-1 p-4 bg-zinc-900 text-zinc-100 h-[250px]">
+        <Card className="flex-1 p-4 bg-zinc-900 text-zinc-100 h-[250px] transition-transform duration-30 hover:scale-110">
           <CardContent>
             <h3 className="text-xl font-semibold mb-2">3-Day Forecast</h3>
             <AnimatePresence mode="wait">
