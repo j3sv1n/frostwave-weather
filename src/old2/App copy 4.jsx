@@ -34,8 +34,6 @@ function App() {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [musicType, setMusicType] = useState("ambient");
   const [musicUrl, setMusicUrl] = useState("");
-  const [audio, setAudio] = useState(null);
-  const [isCrossfading, setIsCrossfading] = useState(false); 
   
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -95,16 +93,19 @@ function App() {
 
   const fetchMusic = async (weatherCondition, musicTypeOverride = musicType) => {
     try {
-      console.log("Raw weather condition:", weatherCondition);
-      console.log("Music type override:", musicTypeOverride);
+      console.log("Raw weather condition:", weatherCondition); // Debugging log
+      console.log("Music type override:", musicTypeOverride); // Debugging log
   
+      // Fetch the music.json file from the public directory
       const response = await axios.get("/music.json");
       const musicData = response.data;
       console.log("Music data fetched:", musicData);
   
+      // Extract the keys (presets) from music.json
       const presets = Object.keys(musicData);
       console.log("Available presets:", presets);
   
+      // Find the closest match for the weather condition
       const findClosestMatch = (condition, presets) => {
         const normalizedCondition = condition.toLowerCase();
         let closestMatch = presets[0];
@@ -121,6 +122,7 @@ function App() {
         return closestMatch;
       };
   
+      // Calculate similarity between two strings
       const calculateSimilarity = (str1, str2) => {
         const words1 = str1.split(/\s+/);
         const words2 = str2.split(/_/);
@@ -131,19 +133,20 @@ function App() {
       const closestPreset = findClosestMatch(weatherCondition, presets);
       console.log("Closest preset:", closestPreset);
   
+      // Use the closest preset to fetch the music
       if (musicData[closestPreset]) {
         const conditionMusic = musicData[closestPreset];
         if (musicTypeOverride === "ambient") {
           const ambientUrl = conditionMusic.ambient;
           console.log("Ambient music URL:", ambientUrl);
-          playMusic(ambientUrl, true); // Play ambient music with looping
+          setMusicUrl(ambientUrl);
         } else if (musicTypeOverride === "songs") {
           const randomSong =
             conditionMusic.songs[
               Math.floor(Math.random() * conditionMusic.songs.length)
             ];
           console.log("Random song URL:", randomSong);
-          playMusic(randomSong, false); // Play a random song without looping
+          setMusicUrl(randomSong);
         }
       } else {
         console.error("No music found for the closest preset.");
@@ -151,70 +154,6 @@ function App() {
     } catch (error) {
       console.error("Error fetching music metadata:", error);
     }
-  };
-
-  const playMusic = (url, isAmbient) => {
-    if (audio) {
-      // Stop the current audio and clear its event listeners
-      audio.pause();
-      audio.onended = null; // Clear the onended handler
-      setAudio(null);
-    }
-  
-    // Create a new audio element
-    const newAudio = new Audio(url);
-    newAudio.volume = isAmbient ? 0.5 : 1.0; // Set volume to 50% for ambient
-    newAudio.loop = isAmbient; // Loop for ambient music
-  
-    // Set up the onended handler for songs mode
-    if (!isAmbient) {
-      newAudio.onended = () => {
-        // Play the next random song for "songs" mode
-        fetchMusic(weather.current.condition.text, "songs");
-      };
-    }
-  
-    setAudio(newAudio); // Update the audio state
-    newAudio.play(); // Start playing the new audio
-  };
-
-  const crossfadeAudio = (currentAudio, nextUrl, isAmbient) => {
-    setIsCrossfading(true);
-  
-    // Fade out the current audio
-    const fadeOutInterval = setInterval(() => {
-      if (currentAudio.volume > 0.1) {
-        currentAudio.volume -= 0.1;
-      } else {
-        clearInterval(fadeOutInterval);
-        currentAudio.pause();
-        currentAudio.src = ""; // Clear the source
-        currentAudio.load();
-        setAudio(null);
-  
-        // Play the next track
-        const nextAudio = new Audio(nextUrl);
-        nextAudio.volume = 0.0; // Start with 0 volume
-        nextAudio.loop = isAmbient; // Loop for ambient music
-        nextAudio.onended = () => {
-          if (!isAmbient) {
-            fetchMusic(weather.current.condition.text, "songs");
-          }
-        };
-        setAudio(nextAudio);
-        nextAudio.play();
-  
-        // Fade in the next audio
-        const fadeInInterval = setInterval(() => {
-          if (nextAudio.volume < (isAmbient ? 0.5 : 1.0)) {
-            nextAudio.volume += 0.1;
-          } else {
-            clearInterval(fadeInInterval);
-            setIsCrossfading(false);
-          }
-        }, 200); // Adjust fade duration as needed
-      }
-    }, 200); // Adjust fade duration as needed
   };
 
   const getUserLocation = () => {
@@ -581,6 +520,7 @@ function App() {
             </CardContent>
           </Card>
         </div>
+        <audio src={musicUrl} autoPlay loop />
       </div>
     </div>
   );
