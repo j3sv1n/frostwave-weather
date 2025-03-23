@@ -91,10 +91,9 @@ function App() {
     }
   };
 
-  const fetchMusic = async (weatherCondition, musicTypeOverride = musicType) => {
+  const fetchMusic = async (weatherCondition) => {
     try {
       console.log("Raw weather condition:", weatherCondition); // Debugging log
-      console.log("Music type override:", musicTypeOverride); // Debugging log
   
       // Fetch the music.json file from the public directory
       const response = await axios.get("/music.json");
@@ -136,11 +135,11 @@ function App() {
       // Use the closest preset to fetch the music
       if (musicData[closestPreset]) {
         const conditionMusic = musicData[closestPreset];
-        if (musicTypeOverride === "ambient") {
+        if (musicType === "ambient") {
           const ambientUrl = conditionMusic.ambient;
           console.log("Ambient music URL:", ambientUrl);
           setMusicUrl(ambientUrl);
-        } else if (musicTypeOverride === "songs") {
+        } else if (musicType === "songs") {
           const randomSong =
             conditionMusic.songs[
               Math.floor(Math.random() * conditionMusic.songs.length)
@@ -265,7 +264,7 @@ function App() {
                   // Only fetch music if weather data is available
                   if (weather && weather.current && weather.current.condition) {
                     console.log(`Switch toggled. New music type: ${newMusicType}`);
-                    fetchMusic(weather.current.condition.text, newMusicType); // Pass the new music type
+                    fetchMusic(weather.current.condition.text); // Update music based on toggle
                   } else {
                     console.warn("Weather data is not available. Cannot fetch music.");
                   }

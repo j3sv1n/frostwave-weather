@@ -1,0 +1,68 @@
+{
+    "blizzard": {
+      "ambient": "/music/blizzard_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "cloudy": {
+      "ambient": "/music/cloudy_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "dust": {
+      "ambient": "/music/dust_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "freeze": {
+      "ambient": "/music/freeze_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "misty": {
+      "ambient": "/music/misty_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "overcast": {
+      "ambient": "/music/overcast_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "rainy": {
+      "ambient": "/music/rainy_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "showers": {
+      "ambient": "/music/showers_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "snow": {
+      "ambient": "/music/snow_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "sunny": {
+      "ambient": "/music/sunny_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    },
+    "thunderstorm": {
+      "ambient": "/music/thunderstorm_ambient.mp3",
+      "songs": [
+        "/music/memories.mp3"
+      ]
+    }
+}

@@ -10,7 +10,6 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton"
 import { Toggle } from "@/components/ui/toggle"
-import { Switch } from "@/components/ui/switch"
 import { Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Search, Navigation, Heart } from "lucide-react";
@@ -23,6 +22,7 @@ const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
 const WEATHER_URL = import.meta.env.VITE_WEATHER_URL;
 const SEARCH_URL = import.meta.env.VITE_SEARCH_URL;
 const GEMINI_URL = import.meta.env.VITE_GEMINI_URL;
+const AUDIUS_API_URL = import.meta.env.VITE_AUDIUS_URL;
 
 function App() {
   const [location, setLocation] = useState("");
@@ -30,14 +30,14 @@ function App() {
   const [aiSummary, setAiSummary] = useState("");
   const [favorites, setFavorites] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const [musicUrl, setMusicUrl] = useState("");
   const inputRef = useRef(null);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [musicType, setMusicType] = useState("ambient");
-  const [musicUrl, setMusicUrl] = useState("");
   
   useEffect(() => {
     document.documentElement.classList.add("dark");
     getUserLocation();
+    fetchMusic();
     const savedFavorites = Cookies.get("favorites");
     if (savedFavorites) {
       try {
@@ -91,71 +91,6 @@ function App() {
     }
   };
 
-  const fetchMusic = async (weatherCondition, musicTypeOverride = musicType) => {
-    try {
-      console.log("Raw weather condition:", weatherCondition); // Debugging log
-      console.log("Music type override:", musicTypeOverride); // Debugging log
-  
-      // Fetch the music.json file from the public directory
-      const response = await axios.get("/music.json");
-      const musicData = response.data;
-      console.log("Music data fetched:", musicData);
-  
-      // Extract the keys (presets) from music.json
-      const presets = Object.keys(musicData);
-      console.log("Available presets:", presets);
-  
-      // Find the closest match for the weather condition
-      const findClosestMatch = (condition, presets) => {
-        const normalizedCondition = condition.toLowerCase();
-        let closestMatch = presets[0];
-        let highestSimilarity = 0;
-  
-        presets.forEach((preset) => {
-          const similarity = calculateSimilarity(normalizedCondition, preset);
-          if (similarity > highestSimilarity) {
-            highestSimilarity = similarity;
-            closestMatch = preset;
-          }
-        });
-  
-        return closestMatch;
-      };
-  
-      // Calculate similarity between two strings
-      const calculateSimilarity = (str1, str2) => {
-        const words1 = str1.split(/\s+/);
-        const words2 = str2.split(/_/);
-        const commonWords = words1.filter((word) => words2.includes(word));
-        return commonWords.length / Math.max(words1.length, words2.length);
-      };
-  
-      const closestPreset = findClosestMatch(weatherCondition, presets);
-      console.log("Closest preset:", closestPreset);
-  
-      // Use the closest preset to fetch the music
-      if (musicData[closestPreset]) {
-        const conditionMusic = musicData[closestPreset];
-        if (musicTypeOverride === "ambient") {
-          const ambientUrl = conditionMusic.ambient;
-          console.log("Ambient music URL:", ambientUrl);
-          setMusicUrl(ambientUrl);
-        } else if (musicTypeOverride === "songs") {
-          const randomSong =
-            conditionMusic.songs[
-              Math.floor(Math.random() * conditionMusic.songs.length)
-            ];
-          console.log("Random song URL:", randomSong);
-          setMusicUrl(randomSong);
-        }
-      } else {
-        console.error("No music found for the closest preset.");
-      }
-    } catch (error) {
-      console.error("Error fetching music metadata:", error);
-    }
-  };
-
   const getUserLocation = () => {
     console.log("Attempting to get user location..."); 
     navigator.geolocation.getCurrentPosition(
@@ -171,6 +106,18 @@ function App() {
       }
     );
   };
+
+  const fetchMusic = async () => {
+    try {
+      console.log("Fetching music from backend...");
+      const response = await axios.get("http://localhost:5000/get-music");
+      console.log("Full API Response:", response.data); 
+      console.log("Fetched Music URL:", response.data.streamUrl);
+      setMusicUrl(response.data.streamUrl);
+    } catch (error) {
+      console.error("Error fetching music:", error);
+    }
+  };       
     
   const fetchWeather = async (loc) => {
   console.log(`Fetching weather for location: ${loc}`); 
@@ -252,28 +199,8 @@ function App() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
-            {/* <div className="pt-2">
+            <div className="pt-2">
               <ThemeToggle />
-            </div> */}
-            <div className="flex items-center space-x-2">
-              <Switch
-                checked={musicType === "songs"}
-                onCheckedChange={(isChecked) => {
-                  const newMusicType = isChecked ? "songs" : "ambient";
-                  setMusicType(newMusicType);
-
-                  // Only fetch music if weather data is available
-                  if (weather && weather.current && weather.current.condition) {
-                    console.log(`Switch toggled. New music type: ${newMusicType}`);
-                    fetchMusic(weather.current.condition.text, newMusicType); // Pass the new music type
-                  } else {
-                    console.warn("Weather data is not available. Cannot fetch music.");
-                  }
-                }}
-              />
-              <span className="text-zinc-100">
-                {musicType === "ambient" ? "Ambient" : "Songs"}
-              </span>
             </div>
           </div>
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 text-lg text-zinc-400">
@@ -520,7 +447,6 @@ function App() {
             </CardContent>
           </Card>
         </div>
-        <audio src={musicUrl} autoPlay loop />
       </div>
     </div>
   );
