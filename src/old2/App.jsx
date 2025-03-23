@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { Search, Navigation, Heart } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
-import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog } from "weather-icons-react";
 
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
@@ -48,32 +47,6 @@ function App() {
       }
     }
   }, []);
-
-  const getWeatherIcon = (condition) => {
-    const zinc100Color = "rgb(244, 244, 245)";
-    switch (condition.toLowerCase()) {
-      case "sunny":
-      case "clear":
-        return <WiDaySunny size={192} color={zinc100Color} />;
-      case "cloudy":
-      case "partly cloudy":
-        return <WiCloud size={192} color={zinc100Color} />;
-      case "rain":
-      case "showers":
-        return <WiRain size={192} color={zinc100Color} />;
-      case "snow":
-      case "sleet":
-        return <WiSnow size={192} color={zinc100Color} />;
-      case "thunderstorm":
-      case "storm":
-        return <WiThunderstorm size={192} color={zinc100Color} />;
-      case "fog":
-      case "mist":
-        return <WiFog size={192} color={zinc100Color} />;
-      default:
-        return <WiDaySunny size={192} color={zinc100Color} />;
-    }
-  };
 
   const toggleFavorite = (place) => {
     if (!place) return; 
@@ -193,8 +166,7 @@ function App() {
   };
 
   return (
-    //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
-    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
+    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
       <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col h-screen">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
@@ -347,16 +319,18 @@ function App() {
           <AnimatePresence mode="wait">
             {weather ? (
               <motion.div
-                key={weather.location.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
+                key={weather.location.name} // Trigger animation on location change
+                initial={{ opacity: 0, y: 20 }} // Start animation
+                animate={{ opacity: 1, y: 0 }} // End animation
+                exit={{ opacity: 0, y: -20 }} // Exit animation
+                transition={{ duration: 0.5 }} // Animation duration
                 className="flex items-center space-x-6"
               >
-                <div className="drop-shadow-lg transition-transform duration-300 hover:scale-125 hover:drop-shadow-glow" >
-                  {getWeatherIcon(weather.current.condition.text)}
-                </div>
+                <img
+                  src={sunLogo}
+                  className="w-56 h-56 object-contain drop-shadow-lg transition-transform duration-300 hover:scale-110 hover:drop-shadow-glow"
+                  alt="Weather Icon"
+                />
                 <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:scale-110 hover:drop-shadow-glow">
                   {Math.round(
                     weather.current.temp_c % 1 < 0.6
@@ -399,7 +373,7 @@ function App() {
           </Card>
 
           <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 h-[250px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="overflow-hidden">
+            <CardContent>
               <h3 className="text-xl font-semibold mb-2">3-Day Forecast</h3>
               <AnimatePresence mode="wait">
                 {weather?.forecast?.forecastday ? (
@@ -410,7 +384,7 @@ function App() {
                     exit={{ opacity: 0, y: -10 }} // Exit animation
                     transition={{ duration: 0.5 }} // Animation duration
                   >
-                    <Table className="overflow-hidden">
+                    <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Day</TableHead>
@@ -426,9 +400,7 @@ function App() {
                               })}
                             </TableCell>
                             <TableCell className="flex items-center space-x-2">
-                              <div className="flex items-center justify-center w-8 h-8">
-                                {getWeatherIcon(day.day.condition.text)}
-                              </div>
+                              <img src={sunLogo} className="w-8 h-8" alt="Weather Icon" />
                               <span>{day.day.avgtemp_c}°C</span>
                             </TableCell>
                           </TableRow>
