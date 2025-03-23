@@ -169,7 +169,7 @@ function App() {
     <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col h-screen">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <h1 className="text-4xl font-bold text-zinc-100">Frostwave</h1>
+          <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
           <ThemeToggle />
         </div>
         <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 text-lg text-zinc-400">
@@ -330,7 +330,7 @@ function App() {
               />
               <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:scale-110 hover:drop-shadow-glow">
                 {Math.round(
-                  weather.current.temp_c < 0.5
+                  weather.current.temp_c % 1 < 0.6
                     ? Math.floor(weather.current.temp_c)
                     : Math.ceil(weather.current.temp_c)
                 )}
