@@ -136,14 +136,14 @@ function App() {
         if (musicTypeOverride === "ambient") {
           const ambientUrl = conditionMusic.ambient;
           console.log("Ambient music URL:", ambientUrl);
-          playMusic(ambientUrl, true); // Play ambient music with looping
+          playMusic(ambientUrl, true); 
         } else if (musicTypeOverride === "songs") {
           const randomSong =
             conditionMusic.songs[
               Math.floor(Math.random() * conditionMusic.songs.length)
             ];
           console.log("Random song URL:", randomSong);
-          playMusic(randomSong, false); // Play a random song without looping
+          playMusic(randomSong, false);
         }
       } else {
         console.error("No music found for the closest preset.");
@@ -155,47 +155,41 @@ function App() {
 
   const playMusic = (url, isAmbient) => {
     if (audio) {
-      // Stop the current audio and clear its event listeners
       audio.pause();
-      audio.onended = null; // Clear the onended handler
+      audio.onended = null;
       setAudio(null);
     }
   
-    // Create a new audio element
     const newAudio = new Audio(url);
-    newAudio.volume = isAmbient ? 0.5 : 1.0; // Set volume to 50% for ambient
-    newAudio.loop = isAmbient; // Loop for ambient music
+    newAudio.volume = isAmbient ? 0.5 : 1.0;
+    newAudio.loop = isAmbient;
   
-    // Set up the onended handler for songs mode
     if (!isAmbient) {
       newAudio.onended = () => {
-        // Play the next random song for "songs" mode
         fetchMusic(weather.current.condition.text, "songs");
       };
     }
   
-    setAudio(newAudio); // Update the audio state
-    newAudio.play(); // Start playing the new audio
+    setAudio(newAudio);
+    newAudio.play();
   };
 
   const crossfadeAudio = (currentAudio, nextUrl, isAmbient) => {
     setIsCrossfading(true);
   
-    // Fade out the current audio
     const fadeOutInterval = setInterval(() => {
       if (currentAudio.volume > 0.1) {
         currentAudio.volume -= 0.1;
       } else {
         clearInterval(fadeOutInterval);
         currentAudio.pause();
-        currentAudio.src = ""; // Clear the source
+        currentAudio.src = "";
         currentAudio.load();
         setAudio(null);
   
-        // Play the next track
         const nextAudio = new Audio(nextUrl);
-        nextAudio.volume = 0.0; // Start with 0 volume
-        nextAudio.loop = isAmbient; // Loop for ambient music
+        nextAudio.volume = 0.0;
+        nextAudio.loop = isAmbient; 
         nextAudio.onended = () => {
           if (!isAmbient) {
             fetchMusic(weather.current.condition.text, "songs");
@@ -212,9 +206,9 @@ function App() {
             clearInterval(fadeInInterval);
             setIsCrossfading(false);
           }
-        }, 200); // Adjust fade duration as needed
+        }, 200);
       }
-    }, 200); // Adjust fade duration as needed
+    }, 200); 
   };
 
   const getUserLocation = () => {
@@ -316,17 +310,16 @@ function App() {
             {/* <div className="pt-2">
               <ThemeToggle />
             </div> */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 pt-1">
               <Switch
                 checked={musicType === "songs"}
                 onCheckedChange={(isChecked) => {
                   const newMusicType = isChecked ? "songs" : "ambient";
                   setMusicType(newMusicType);
 
-                  // Only fetch music if weather data is available
                   if (weather && weather.current && weather.current.condition) {
                     console.log(`Switch toggled. New music type: ${newMusicType}`);
-                    fetchMusic(weather.current.condition.text, newMusicType); // Pass the new music type
+                    fetchMusic(weather.current.condition.text, newMusicType); 
                   } else {
                     console.warn("Weather data is not available. Cannot fetch music.");
                   }
