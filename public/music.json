@@ -2,67 +2,118 @@
     "blizzard": {
       "ambient": "/music/blizzard_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/blizzard/Blue Foundation - Eyes On Fire (Official Music Video).mp3",
+        "/music/blizzard/Hozier - Take Me To Church.mp3",
+        "/music/blizzard/James Bay - Let It Go.mp3",
+        "/music/blizzard/Mad World (feat. Gary Jules) - Official Music Video.mp3",
+        "/music/blizzard/Set Fire to the Rain.mp3",
+        "/music/blizzard/Vietsub Snow (Hey Oh) - Red Hot Chilli Peppers Lyrics Video.mp3"
       ]
     },
     "cloudy": {
       "ambient": "/music/cloudy_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/cloudy/Adele - Someone Like You (Official Music Video).mp3",
+        "/music/cloudy/Coldplay - Yellow (Official Video).mp3",
+        "/music/cloudy/Green Day - Boulevard Of Broken Dreams [Official Music Video].mp3",
+        "/music/cloudy/Norah Jones - Come Away With Me.mp3",
+        "/music/cloudy/Sia - Breathe Me.mp3",
+        "/music/cloudy/Snow Patrol - Chasing Cars (Official Video).mp3"
       ]
     },
     "dust": {
       "ambient": "/music/dust_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/dust/Alex Yurkiv, Thelma Costolo - Take Me to the River (I Will Swim) (Live).mp3",
+        "/music/dust/Cage The Elephant - Ain't No Rest For The Wicked (Official Video).mp3",
+        "/music/dust/The Animals - House Of The Rising Sun (Music Video) [4K HD].mp3",
+        "/music/dust/The Doors - Riders on the Storm (Official Audio).mp3",
+        "/music/dust/The White Stripes - Seven Nation Army (Official Music Video).mp3"
       ]
     },
     "freeze": {
       "ambient": "/music/freeze_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/freeze/Disturbed - The Sound Of Silence (Official Music Video) [4K UPGRADE].mp3",
+        "/music/freeze/Fleet Foxes - White Winter Hymnal (OFFICIAL VIDEO).mp3",
+        "/music/freeze/Joshua Radin - Winter.mp3",
+        "/music/freeze/Radiohead - Creep.mp3",
+        "/music/freeze/Somebody That I Used To Know Gotye Lyrics Video.mp3"
       ]
     },
     "misty": {
       "ambient": "/music/misty_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/misty/Birdy - Skinny Love [Official Music Video].mp3",
+        "/music/misty/Coldplay - Fix You (Official Video).mp3",
+        "/music/misty/Eric Clapton - Tears In Heaven (Official Video).mp3",
+        "/music/misty/Fleetwood Mac - Landslide (Official Music Video) [HD].mp3",
+        "/music/misty/Keane - Somewhere Only We Know (Official Music Video).mp3",
+        "/music/misty/Lord Huron - The Night We Met (Official Audio).mp3"
       ]
     },
     "overcast": {
       "ambient": "/music/overcast_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/overcast/Amy Winehouse - Back To Black.mp3",
+        "/music/overcast/Ed Sheeran - The A Team [Official Music Video].mp3",
+        "/music/overcast/Jessie Ware - Say You Love Me (Official Music Video).mp3",
+        "/music/overcast/John Mayer - Gravity (Lyrics).mp3",
+        "/music/overcast/Wicked Game.mp3"
       ]
     },
     "rainy": {
       "ambient": "/music/rainy_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/rainy/Adele - Make You Feel My Love (Official Video).mp3",
+        "/music/rainy/Creedence Clearwater Revival - Have You Ever Seen The Rain (Official).mp3",
+        "/music/rainy/Elvis Presley - Can't Help Falling in Love (Lyrics).mp3",
+        "/music/rainy/Let It Rain.mp3",
+        "/music/rainy/Paramore - When It Rains (Official Audio).mp3",
+        "/music/rainy/The Script - Rain (Official Video).mp3"
       ]
     },
     "showers": {
       "ambient": "/music/showers_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/rainy/Adele - Make You Feel My Love (Official Video).mp3",
+        "/music/rainy/Creedence Clearwater Revival - Have You Ever Seen The Rain (Official).mp3",
+        "/music/rainy/Elvis Presley - Can't Help Falling in Love (Lyrics).mp3",
+        "/music/rainy/Let It Rain.mp3",
+        "/music/rainy/Paramore - When It Rains (Official Audio).mp3",
+        "/music/rainy/The Script - Rain (Official Video).mp3"
       ]
     },
     "snow": {
       "ambient": "/music/snow_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/snow/Coldplay - The Scientist (Official 4K Video).mp3",
+        "/music/snow/Jeff Buckley - Hallelujah (Official Video).mp3",
+        "/music/snow/Kodaline - All I Want (Part 1).mp3",
+        "/music/snow/Lily Allen - Somewhere Only We Know (John Lewis Christmas Advert).mp3",
+        "/music/snow/The Neighbourhood - Sweater Weather (Official Video).mp3",
+        "/music/snow/WINTER SONG - SARA BAREILLES & INGRID MICHAELSON WITH LYRICS.mp3"
       ]
     },
     "sunny": {
       "ambient": "/music/sunny_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/sunny/American Authors - Best Day Of My Life.mp3",
+        "/music/sunny/Electric Light Orchestra - Mr. Blue Sky (Official Video).mp3",
+        "/music/sunny/Imagine Dragons - On Top Of The World (Official Music Video).mp3",
+        "/music/sunny/Katrina & The Waves - Walking On Sunshine (Official Music Video).mp3",
+        "/music/sunny/Pharrell Williams - Happy (Video).mp3",
+        "/music/sunny/The Beatles - Here Comes The Sun (2019 Mix).mp3"
       ]
     },
     "thunderstorm": {
       "ambient": "/music/thunderstorm_ambient.mp3",
       "songs": [
-        "/music/memories.mp3"
+        "/music/thunderstorm/ACDC - Thunderstruck (Official Video).mp3",
+        "/music/thunderstorm/Imagine Dragons - Radioactive.mp3",
+        "/music/thunderstorm/KALEO - Way Down We Go (Official Music Video).mp3",
+        "/music/thunderstorm/Queens Of The Stone Age - No One Knows (Official Music Video).mp3",
+        "/music/thunderstorm/The Rolling Stones - Paint It, Black (Official Lyric Video).mp3"
       ]
     }
 }
