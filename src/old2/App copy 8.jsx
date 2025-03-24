@@ -17,9 +17,9 @@ import { cn } from "@/lib/utils";
 import { Search, Navigation, Heart } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
-import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog, WiStrongWind } from "weather-icons-react";
+import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog } from "weather-icons-react";
 import { ChartContainer } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { WiSmoke } from "react-icons/wi";
 
 
@@ -41,7 +41,6 @@ function App() {
   const [musicUrl, setMusicUrl] = useState("");
   const [audio, setAudio] = useState(null);
   const [isCrossfading, setIsCrossfading] = useState(false); 
-  
   
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -249,24 +248,6 @@ function App() {
     }
   };
 
-  const calculateDaylightDuration = (sunrise, sunset) => {
-    const parseTime = (time) => {
-      const [hours, minutesPart] = time.split(":");
-      const minutes = parseInt(minutesPart, 10);
-      const isPM = time.toLowerCase().includes("pm");
-      return parseInt(hours, 10) % 12 + (isPM ? 12 : 0) + minutes / 60;
-    };
-
-    const sunriseTime = parseTime(sunrise);
-    const sunsetTime = parseTime(sunset);
-    const daylightHours = sunsetTime - sunriseTime;
-
-    const hours = Math.floor(daylightHours);
-    const minutes = Math.round((daylightHours - hours) * 60);
-
-    return `${hours} hr ${minutes} min`;
-  };
-
   const getHourlyForecastData = () => {
     if (!weather?.forecast?.forecastday) return [];
     const currentHour = new Date().getHours();
@@ -357,9 +338,9 @@ function App() {
 
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
-    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30">
-      <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col min-h-screen">
-        <div className="sticky top-2 flex justify-between items-center">
+    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
+      <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col h-screen">
+        <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
             {/* <div className="pt-2">
@@ -653,137 +634,55 @@ function App() {
         </div>
         
         <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Humidity</h3>
-                {weather?.current?.humidity ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.humidity}%</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.humidity > 70 ? "High" : "Normal"}
-                    </p>
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[200px] transition-transform duration-30 hover:scale-110">
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-2">Humidity</h3>
+              {weather?.current?.humidity ? (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center justify-center w-12 h-12 bg-zinc-800 rounded-full">
+                    <WiRain
+                      className={`text-4xl ${
+                        weather.current.humidity > 70 ? "text-blue-500" : "text-green-500"
+                      }`}
+                    />
                   </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiRain className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">UV Index</h3>
-                {weather?.current?.uv !== undefined ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.uv}</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.uv === 0
-                        ? "Very Low"
-                        : weather.current.uv > 7
-                        ? "High"
-                        : weather.current.uv > 3
-                        ? "Moderate"
-                        : "Low"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiDaySunny
-                  className={`text-6xl ${
-                    weather?.current?.uv > 7 ? "text-red-500" : "text-white"
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[220px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
-                {weather?.current?.wind_kph ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.wind_kph} kph</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.wind_kph > 30 ? "Strong" : "Moderate"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiStrongWind className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-col justify-center">
-              <div className="text-left">
-                <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
-                  <p className="text-sm text-zinc-400">
-                  {weather?.forecast?.forecastday[0]?.astro
-                    ? `${calculateDaylightDuration(
-                        weather.forecast.forecastday[0].astro.sunrise,
-                        weather.forecast.forecastday[0].astro.sunset
-                      )} · Daylight`
-                    : "Loading..."}
-                </p>
-              </div>
-              {weather?.forecast?.forecastday[0]?.astro ? (
-                <div className="w-full">
-                  <ResponsiveContainer width="100%" height={100}>
-                    <LineChart
-                      data={[
-                        { time: "Start", value: 0 },
-                        { time: "Sunrise", value: 20 },
-                        { time: "Noon", value: 100 },
-                        { time: "Sunset", value: 20 },
-                        { time: "End", value: 0 },
-                      ]}
-                    >
-                      {/* X-Axis */}
-                      <XAxis
-                        dataKey="time"
-                        tick={false} // Remove X-Axis labels
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      {/* Y-Axis */}
-                      <YAxis hide />
-                      {/* Horizontal Reference Line */}
-                      <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
-                      {/* Inverted U Shape */}
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#ffffff" // White for the curve
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                  <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
-                    <span>{weather.forecast.forecastday[0].astro.sunrise}</span>
-                    <span>{weather.forecast.forecastday[0].astro.sunset}</span>
-                  </div>
+                  <p className="text-base">
+                    {weather.current.humidity}% {weather.current.humidity > 70 ? "(High)" : "(Normal)"}
+                  </p>
                 </div>
               ) : (
                 <Skeleton className="w-full h-12 rounded" />
               )}
             </CardContent>
           </Card>
+
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[200px] transition-transform duration-30 hover:scale-110">
+            <CardContent>
+                <h3 className="text-xl font-semibold mb-2">UV Index</h3>
+                {weather?.current?.uv !== undefined ? (
+                    <div className="flex items-center space-x-4">
+                        <div className="flex items-center justify-center w-12 h-12 bg-zinc-800 rounded-full">
+                            <WiDaySunny
+                                className={`text-4xl ${
+                                    weather.current.uv > 7
+                                        ? "text-red-500"
+                                        : weather.current.uv > 3
+                                        ? "text-yellow-500"
+                                        : "text-green-500"
+                                }`}
+                            />
+                        </div>
+                        <p className="text-base">
+                            {weather.current.uv === 0 ? "0 (Very Low)" : 
+                            weather.current.uv > 7 ? "High" : 
+                            weather.current.uv > 3 ? "Moderate" : "Low"}
+                        </p>
+                    </div>
+                ) : (
+                    <Skeleton className="w-full h-12 rounded" /> // Keep the skeleton
+                )}
+            </CardContent>
+        </Card>
         </div>
 
       </div>

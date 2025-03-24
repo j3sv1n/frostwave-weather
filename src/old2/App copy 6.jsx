@@ -11,17 +11,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Skeleton } from "@/components/ui/skeleton"
 import { Toggle } from "@/components/ui/toggle"
 import { Switch } from "@/components/ui/switch"
-import { GlowArea, Glow } from "./Glow"
 import { Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Search, Navigation, Heart } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
-import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog, WiStrongWind } from "weather-icons-react";
-import { ChartContainer } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import { WiSmoke } from "react-icons/wi";
-
+import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog } from "weather-icons-react";
 
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
@@ -41,7 +36,6 @@ function App() {
   const [musicUrl, setMusicUrl] = useState("");
   const [audio, setAudio] = useState(null);
   const [isCrossfading, setIsCrossfading] = useState(false); 
-  
   
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -234,65 +228,24 @@ function App() {
   };
     
   const fetchWeather = async (loc) => {
-    console.log(`Fetching weather for location: ${loc}`); 
-    try {
-      const response = await axios.get(WEATHER_URL, {
-        params: { key: API_KEY, q: loc, days: 7 },
-      });
-      console.log("Weather data fetched successfully:", response.data); 
-      setWeather(response.data); 
-      setCurrentLocation(loc); 
-      fetchAiSummary(response.data); 
-      fetchMusic(response.data.current.condition.text); 
-    } catch (error) {
-      console.error("Error fetching weather:", error); 
-    }
-  };
-
-  const calculateDaylightDuration = (sunrise, sunset) => {
-    const parseTime = (time) => {
-      const [hours, minutesPart] = time.split(":");
-      const minutes = parseInt(minutesPart, 10);
-      const isPM = time.toLowerCase().includes("pm");
-      return parseInt(hours, 10) % 12 + (isPM ? 12 : 0) + minutes / 60;
-    };
-
-    const sunriseTime = parseTime(sunrise);
-    const sunsetTime = parseTime(sunset);
-    const daylightHours = sunsetTime - sunriseTime;
-
-    const hours = Math.floor(daylightHours);
-    const minutes = Math.round((daylightHours - hours) * 60);
-
-    return `${hours} hr ${minutes} min`;
-  };
-
-  const getHourlyForecastData = () => {
-    if (!weather?.forecast?.forecastday) return [];
-    const currentHour = new Date().getHours();
-    const todayForecast = weather.forecast.forecastday[0]?.hour || [];
-    return todayForecast
-      .slice(currentHour, currentHour + 7) // Get current hour and next 6 hours
-      .map((hour) => ({
-        time: new Date(hour.time).toLocaleTimeString("en-US", { hour: "numeric", hour12: true }),
-        temp: hour.temp_c,
-      }));
-  };
-
-  const hourlyData = getHourlyForecastData();
-  console.log("Hourly Data:", hourlyData);
+  console.log(`Fetching weather for location: ${loc}`); 
+  try {
+    const response = await axios.get(WEATHER_URL, {
+      params: { key: API_KEY, q: loc, days: 7 },
+    });
+    console.log("Weather data fetched successfully:", response.data); 
+    setWeather(response.data); 
+    setCurrentLocation(loc); 
+    fetchAiSummary(response.data); 
+    fetchMusic(response.data.current.condition.text); 
+  } catch (error) {
+    console.error("Error fetching weather:", error); 
+  }
+};
 
   const fetchAiSummary = async (weatherData) => {
-    if (!weatherData || !weatherData.forecast || !weatherData.forecast.forecastday) return;
-
-    const forecastDetails = weatherData.forecast.forecastday
-      .map((day) => {
-        const date = new Date(day.date).toLocaleDateString("en-US", { weekday: "long" });
-        return `${date}: ${day.day.avgtemp_c}°C, ${day.day.condition.text}`;
-      })
-      .join("\n");
-
-    const prompt = `Summarize the current weather conditions in a friendly tone. Mention weather conditions and give recommendations. Additionally, suggest the best time of the week to visit based on the 3-day forecast and recommend some food options suitable for the weather. Use line breaks to separate the sections. The response shouldn't be too long (not more than 20 words).\n\nLocation: ${weatherData.location.name}\nTemperature: ${weatherData.current.temp_c}°C\nCondition: ${weatherData.current.condition.text}\n\n3-Day Forecast:\n${forecastDetails}`;
+    if (!weatherData) return;
+    const prompt = `Summarize the current weather conditions in a friendly tone. Mention temperature, weather conditions, and give recommendations if necessary. Don't greet with the place name. Don't make it too big.\n\nLocation: ${weatherData.location.name}\nTemperature: ${weatherData.current.temp_c}°C\nCondition: ${weatherData.current.condition.text}`;
 
     try {
       const response = await axios.post(
@@ -303,21 +256,13 @@ function App() {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY,
+            "x-goog-api-key": GEMINI_API_KEY, 
           },
         }
       );
 
-      if (
-        response.data &&
-        response.data.candidates &&
-        response.data.candidates[0] &&
-        response.data.candidates[0].content &&
-        response.data.candidates[0].content.parts &&
-        response.data.candidates[0].content.parts[0] &&
-        response.data.candidates[0].content.parts[0].text
-      ) {
-        setAiSummary(response.data.candidates[0].content.parts[0].text);
+      if (response.data && response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content && response.data.candidates[0].content.parts && response.data.candidates[0].content.parts[0] && response.data.candidates[0].content.parts[0].text) {
+          setAiSummary(response.data.candidates[0].content.parts[0].text);
       } else {
         setAiSummary("Could not generate AI summary. Please try again later.");
       }
@@ -357,9 +302,9 @@ function App() {
 
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
-    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30">
-      <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col min-h-screen">
-        <div className="sticky top-2 flex justify-between items-center">
+    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
+      <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col h-screen">
+        <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
             {/* <div className="pt-2">
@@ -563,39 +508,17 @@ function App() {
             )}
           </AnimatePresence>
         </div>
-
-        {/* <div className="w-full h-[60px] bg-zinc-950 rounded-lg p-2">
-          {hourlyData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={hourlyData}>
-                <XAxis dataKey="time" tick={{ fill: "#f4f4f5", fontSize: 12 }} />
-                <YAxis hide domain={["auto", "auto"]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1c1c1e",
-                    border: "none",
-                    borderRadius: "4px",
-                    color: "#f4f4f5",
-                  }}
-                />
-                <Line type="monotone" dataKey="temp" stroke="#38bdf8" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="text-zinc-400 text-center">No hourly data available</div>
-          )}
-        </div> */}
     
         <div className="flex flex-row w-full mt-auto" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[250px] transition-transform duration-30 hover:scale-110">
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-center mr-4 h-[250px] transition-transform duration-30 hover:scale-110">
             <CardContent>
-              <h3 className="text-xl font-semibold mb-2 pt-1">Quick Summary</h3>
               {aiSummary ? (
-                <div className="text-base italic pt-2" style={{ textAlign: "justify" }}>
-                  {aiSummary.split("\n\n").map((paragraph, index) => (
-                    <p key={index} className="mb-2">{paragraph}</p>
-                  ))}
-                </div>
+                <p
+                  className="text-lg italic pt-2"
+                  style={{ textAlign: "justify" }}
+                >
+                  {aiSummary}
+                </p>
               ) : (
                 <Skeleton className="w-full h-20 rounded pt-2" />
               )}
@@ -651,141 +574,6 @@ function App() {
             </CardContent>
           </Card>
         </div>
-        
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Humidity</h3>
-                {weather?.current?.humidity ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.humidity}%</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.humidity > 70 ? "High" : "Normal"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiRain className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">UV Index</h3>
-                {weather?.current?.uv !== undefined ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.uv}</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.uv === 0
-                        ? "Very Low"
-                        : weather.current.uv > 7
-                        ? "High"
-                        : weather.current.uv > 3
-                        ? "Moderate"
-                        : "Low"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiDaySunny
-                  className={`text-6xl ${
-                    weather?.current?.uv > 7 ? "text-red-500" : "text-white"
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[220px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
-                {weather?.current?.wind_kph ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.wind_kph} kph</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.wind_kph > 30 ? "Strong" : "Moderate"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiStrongWind className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-col justify-center">
-              <div className="text-left">
-                <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
-                  <p className="text-sm text-zinc-400">
-                  {weather?.forecast?.forecastday[0]?.astro
-                    ? `${calculateDaylightDuration(
-                        weather.forecast.forecastday[0].astro.sunrise,
-                        weather.forecast.forecastday[0].astro.sunset
-                      )} · Daylight`
-                    : "Loading..."}
-                </p>
-              </div>
-              {weather?.forecast?.forecastday[0]?.astro ? (
-                <div className="w-full">
-                  <ResponsiveContainer width="100%" height={100}>
-                    <LineChart
-                      data={[
-                        { time: "Start", value: 0 },
-                        { time: "Sunrise", value: 20 },
-                        { time: "Noon", value: 100 },
-                        { time: "Sunset", value: 20 },
-                        { time: "End", value: 0 },
-                      ]}
-                    >
-                      {/* X-Axis */}
-                      <XAxis
-                        dataKey="time"
-                        tick={false} // Remove X-Axis labels
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      {/* Y-Axis */}
-                      <YAxis hide />
-                      {/* Horizontal Reference Line */}
-                      <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
-                      {/* Inverted U Shape */}
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#ffffff" // White for the curve
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                  <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
-                    <span>{weather.forecast.forecastday[0].astro.sunrise}</span>
-                    <span>{weather.forecast.forecastday[0].astro.sunset}</span>
-                  </div>
-                </div>
-              ) : (
-                <Skeleton className="w-full h-12 rounded" />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
       </div>
     </div>
   );
