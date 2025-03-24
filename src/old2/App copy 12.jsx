@@ -61,21 +61,6 @@ function App() {
         setFavorites([]);
       }
     }
-  }, []);
-
-  useEffect(() => {
-    // Load saved preferences from cookies
-    const savedTempUnit = Cookies.get("temperatureUnit");
-    const savedWindUnit = Cookies.get("windSpeedUnit");
-
-    if (savedTempUnit) setTemperatureUnit(savedTempUnit);
-    if (savedWindUnit) setWindSpeedUnit(savedWindUnit);
-  }, []);
-
-  // Single useEffect for saving to cookies when the state changes
-  useEffect(() => {
-    Cookies.set("temperatureUnit", temperatureUnit, { expires: 365 });
-    Cookies.set("windSpeedUnit", windSpeedUnit, { expires: 365 });
   }, [temperatureUnit, windSpeedUnit]);
 
   const convertTemperature = (tempC) => {
@@ -569,22 +554,48 @@ function App() {
                 <div className="flex flex-col space-y-6 ml-0">
                   <h2 className="text-2xl font-bold">Settings</h2>
                   
+                  {/* Temperature Units */}
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-medium">Temperature Units</span>
-                    <Tabs value={temperatureUnit} onValueChange={setTemperatureUnit}>
+                    <Tabs defaultValue="C">
                       <TabsList>
-                        <TabsTrigger value="C">C</TabsTrigger>
-                        <TabsTrigger value="F">F</TabsTrigger>
+                        <TabsTrigger
+                          value="C"
+                          onClick={() => setTemperatureUnit("C")}
+                          className={temperatureUnit === "C" ? "font-bold" : ""}
+                        >
+                          C
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="F"
+                          onClick={() => setTemperatureUnit("F")}
+                          className={temperatureUnit === "F" ? "font-bold" : ""}
+                        >
+                          F
+                        </TabsTrigger>
                       </TabsList>
                     </Tabs>
                   </div>
 
+                  {/* Wind Speed Units */}
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-medium">Wind Speed Units</span>
-                    <Tabs value={windSpeedUnit} onValueChange={setWindSpeedUnit}>
+                    <Tabs defaultValue="kph">
                       <TabsList>
-                        <TabsTrigger value="kph">kph</TabsTrigger>
-                        <TabsTrigger value="mph">mph</TabsTrigger>
+                        <TabsTrigger
+                          value="kph"
+                          onClick={() => setWindSpeedUnit("kph")}
+                          className={windSpeedUnit === "kph" ? "font-bold" : ""}
+                        >
+                          kph
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="mph"
+                          onClick={() => setWindSpeedUnit("mph")}
+                          className={windSpeedUnit === "mph" ? "font-bold" : ""}
+                        >
+                          mph
+                        </TabsTrigger>
                       </TabsList>
                     </Tabs>
                   </div>

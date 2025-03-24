@@ -11,13 +11,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Skeleton } from "@/components/ui/skeleton"
 import { Toggle } from "@/components/ui/toggle"
 import { Switch } from "@/components/ui/switch"
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { GlowArea, Glow } from "@/components/Glow"
 import { Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Search, Navigation, Heart, Settings } from "lucide-react";
+import { Search, Navigation, Heart } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog, WiStrongWind } from "weather-icons-react";
@@ -44,9 +41,6 @@ function App() {
   const [musicUrl, setMusicUrl] = useState("");
   const [audio, setAudio] = useState(null);
   const [isCrossfading, setIsCrossfading] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [temperatureUnit, setTemperatureUnit] = useState("C");
-  const [windSpeedUnit, setWindSpeedUnit] = useState("kph");
   
   
   useEffect(() => {
@@ -62,29 +56,6 @@ function App() {
       }
     }
   }, []);
-
-  useEffect(() => {
-    // Load saved preferences from cookies
-    const savedTempUnit = Cookies.get("temperatureUnit");
-    const savedWindUnit = Cookies.get("windSpeedUnit");
-
-    if (savedTempUnit) setTemperatureUnit(savedTempUnit);
-    if (savedWindUnit) setWindSpeedUnit(savedWindUnit);
-  }, []);
-
-  // Single useEffect for saving to cookies when the state changes
-  useEffect(() => {
-    Cookies.set("temperatureUnit", temperatureUnit, { expires: 365 });
-    Cookies.set("windSpeedUnit", windSpeedUnit, { expires: 365 });
-  }, [temperatureUnit, windSpeedUnit]);
-
-  const convertTemperature = (tempC) => {
-    return temperatureUnit === "F" ? (tempC * 9) / 5 + 32 : tempC;
-  };
-
-  const convertWindSpeed = (speedKph) => {
-    return windSpeedUnit === "mph" ? speedKph * 0.621371 : speedKph;
-  };
 
   const getWeatherIcon = (condition) => {
     const zinc100Color = "rgb(244, 244, 245)";
@@ -431,167 +402,127 @@ function App() {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <div className="relative">
-                  <Input
-                    ref={inputRef}
-                    type="text"
-                    value={location}
-                    onFocus={() => setSearchResults([])}
-                    onChange={(e) => {
-                      const query = e.target.value;
-                      setLocation(query);
-                      debouncedFetchSearchResults(query);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && searchResults.length > 0) {
-                        fetchWeather(searchResults[0].name);
-                      }
-                    }}
-                    placeholder="Search..."
-                    className="pr-10"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-                    onClick={() => {
-                      if (searchResults.length > 0) {
-                        fetchWeather(searchResults[0].name);
-                      }
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className="relative">
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  value={location}
+                  onFocus={() => setSearchResults([])}
+                  onChange={(e) => {
+                    const query = e.target.value;
+                    setLocation(query);
+                    debouncedFetchSearchResults(query);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && searchResults.length > 0) {
+                      fetchWeather(searchResults[0].name);
+                    }
+                  }}
+                  placeholder="Search..."
+                  className="pr-10"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+                  onClick={() => {
+                    if (searchResults.length > 0) {
+                      fetchWeather(searchResults[0].name);
+                    }
+                  }}
+                >
+                  <Search className="w-5 h-5 text-zinc-400" />
+                </div>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent
+              className="max-w-none"
+              style={{
+                width: inputRef.current ? `${inputRef.current.offsetWidth}px` : "300px",
+              }}
+            >
+
+              {searchResults.length > 0 ? (
+                searchResults.map((result) => (
+                  <div
+                    key={result.id}
+                    className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      fetchWeather(result.name);
                     }}
                   >
-                    <Search className="w-5 h-5 text-zinc-400" />
+                    <span>
+                      {result.name}, {result.region}
+                    </span>
+                    <button
+                      className="ml-2"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(result.name);
+                      }}
+                    >
+                      {favorites.includes(result.name) ? (
+                        <Heart
+                          className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
+                          fill="currentColor"
+                        />
+                      ) : (
+                        <Heart
+                          className="w-5 h-5 text-zinc-400 transition-transform duration-300 hover:scale-110"
+                        />
+                      )}
+                    </button>
                   </div>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent
-                className="max-w-none"
-                style={{
-                  width: inputRef.current ? `${inputRef.current.offsetWidth}px` : "300px",
-                }}
-              >
+                ))
+              ) : (
+                <p className="p-3 text-zinc-400">
+                  {location.trim() === "" ? "Start typing to search..." : "No results found"}
+                </p>
+              )}
 
-                {searchResults.length > 0 ? (
-                  searchResults.map((result) => (
+              {favorites.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-zinc-400 text-sm mb-2">Favorites</h4>
+                  {favorites.map((fav, index) => (
                     <div
-                      key={result.id}
+                      key={index}
                       className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
                       onMouseDown={(e) => {
                         e.preventDefault();
-                        fetchWeather(result.name);
+                        fetchWeather(fav);
                       }}
                     >
-                      <span>
-                        {result.name}, {result.region}
-                      </span>
+                      <span>{fav}</span>
                       <button
                         className="ml-2"
                         onMouseDown={(e) => {
                           e.stopPropagation();
-                          toggleFavorite(result.name);
+                          toggleFavorite(fav);
                         }}
                       >
-                        {favorites.includes(result.name) ? (
-                          <Heart
-                            className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
-                            fill="currentColor"
-                          />
-                        ) : (
-                          <Heart
-                            className="w-5 h-5 text-zinc-400 transition-transform duration-300 hover:scale-110"
-                          />
-                        )}
+                        <Heart
+                          className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
+                          fill="currentColor"
+                        />
                       </button>
                     </div>
-                  ))
-                ) : (
-                  <p className="p-3 text-zinc-400">
-                    {location.trim() === "" ? "Start typing to search..." : "No results found"}
-                  </p>
-                )}
-
-                {favorites.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-zinc-400 text-sm mb-2">Favorites</h4>
-                    {favorites.map((fav, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          fetchWeather(fav);
-                        }}
-                      >
-                        <span>{fav}</span>
-                        <button
-                          className="ml-2"
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(fav);
-                          }}
-                        >
-                          <Heart
-                            className="w-5 h-5 text-red-500 transition-transform duration-300 hover:scale-110"
-                            fill="currentColor"
-                          />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div
-                  className="cursor-pointer flex items-center p-3 hover:bg-zinc-800 rounded mt-2"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    console.log("Current Location button clicked");
-                    getUserLocation();
-                  }}
-                >
-                  <Navigation className="w-5 h-5 text-zinc-400 mr-2" />
-                  <span>Current Location</span>
+                  ))}
                 </div>
-              </PopoverContent>
-            </Popover>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="ml-2 p-2"
-                >
-                  <Settings className="w-5 h-5" /> 
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side="right" 
-                className="p-6 h-screen flex flex-col ml-[-50px]"
+              )}
+
+              <div
+                className="cursor-pointer flex items-center p-3 hover:bg-zinc-800 rounded mt-2"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  console.log("Current Location button clicked");
+                  getUserLocation();
+                }}
               >
-                <div className="flex flex-col space-y-6 ml-0">
-                  <h2 className="text-2xl font-bold">Settings</h2>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium">Temperature Units</span>
-                    <Tabs value={temperatureUnit} onValueChange={setTemperatureUnit}>
-                      <TabsList>
-                        <TabsTrigger value="C">C</TabsTrigger>
-                        <TabsTrigger value="F">F</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium">Wind Speed Units</span>
-                    <Tabs value={windSpeedUnit} onValueChange={setWindSpeedUnit}>
-                      <TabsList>
-                        <TabsTrigger value="kph">kph</TabsTrigger>
-                        <TabsTrigger value="mph">mph</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+                <Navigation className="w-5 h-5 text-zinc-400 mr-2" />
+                <span>Current Location</span>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
     
         <div className="flex-1 flex flex-col justify-center items-center" style={{ minHeight: "300px" }}>
@@ -605,18 +536,16 @@ function App() {
                 transition={{ duration: 0.5 }}
                 className="flex items-center space-x-6"
               >
-                <div className="drop-shadow-lg transition-transform duration-300 hover:drop-shadow-glow" >
+                <div className="drop-shadow-lg transition-transform duration-300 hover:scale-125 hover:drop-shadow-glow" >
                   {getWeatherIcon(weather.current.condition.text)}
                 </div>
-                <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:drop-shadow-glow">
+                <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:scale-110 hover:drop-shadow-glow">
                   {Math.round(
-                    convertTemperature(
-                      weather.current.temp_c % 1 < 0.6
-                        ? Math.floor(weather.current.temp_c)
-                        : Math.ceil(weather.current.temp_c)
-                    )
+                    weather.current.temp_c % 1 < 0.6
+                      ? Math.floor(weather.current.temp_c)
+                      : Math.ceil(weather.current.temp_c)
                   )}
-                  °{temperatureUnit}
+                  °C
                 </p>
               </motion.div>
             ) : (
@@ -697,17 +626,14 @@ function App() {
                           <TableRow key={day.date}>
                             <TableCell>
                               {new Date(day.date).toLocaleDateString("en-US", {
-                                weekday: "long",
+                                weekday: "short",
                               })}
                             </TableCell>
                             <TableCell className="flex items-center space-x-2">
                               <div className="flex items-center justify-center w-8 h-8">
                                 {getWeatherIcon(day.day.condition.text)}
                               </div>
-                              <span>
-                                {Math.round(convertTemperature(day.day.avgtemp_c))}°
-                                {temperatureUnit}
-                              </span>
+                              <span>{day.day.avgtemp_c}°C</span>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -787,11 +713,9 @@ function App() {
                 <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
                 {weather?.current?.wind_kph ? (
                   <div>
-                    <p className="text-4xl font-bold">
-                      {Math.round(convertWindSpeed(weather.current.wind_kph))} {windSpeedUnit}
-                    </p>
+                    <p className="text-4xl font-bold">{weather.current.wind_kph} kph</p>
                     <p className="text-sm text-zinc-400">
-                      {convertWindSpeed(weather.current.wind_kph) > 30 ? "Strong" : "Moderate"}
+                      {weather.current.wind_kph > 30 ? "Strong" : "Moderate"}
                     </p>
                   </div>
                 ) : (

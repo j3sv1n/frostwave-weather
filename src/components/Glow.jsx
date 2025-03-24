@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { cn } from './lib/utils';
+import { cn } from '@/lib/utils';
 
 export function GlowArea({ className, size = 300, children, ...props }) {
   const el = useRef(null);
