@@ -266,7 +266,7 @@ function App() {
     console.log(`Fetching weather for location: ${loc}`); 
     try {
       const response = await axios.get(WEATHER_URL, {
-        params: { key: API_KEY, q: loc, days: 7 },
+        params: { key: API_KEY, q: loc, days: 3 },
       });
       console.log("Weather data fetched successfully:", response.data); 
       setWeather(response.data); 
