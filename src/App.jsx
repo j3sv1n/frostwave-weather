@@ -321,7 +321,7 @@ function App() {
       })
       .join("\n");
 
-    const prompt = `Summarize the current weather conditions in a friendly tone. Mention weather conditions and give recommendations. Additionally, suggest the best time of the week to visit based on the 3-day forecast and recommend some food options suitable for the weather. Use line breaks to separate the sections. The response shouldn't be too long (not more than 20 words).\n\nLocation: ${weatherData.location.name}\nTemperature: ${weatherData.current.temp_c}°C\nCondition: ${weatherData.current.condition.text}\n\n3-Day Forecast:\n${forecastDetails}`;
+    const prompt = `Summarize the current weather conditions in a friendly tone. Mention weather conditions (but not the temperature) and give recommendations. Additionally, suggest the best time of the week to visit based on the 3-day forecast and recommend some food options suitable for the weather. Use line breaks to separate the sections. The response shouldn't be too long (not more than 20 words).\n\nLocation: ${weatherData.location.name}\nTemperature: ${weatherData.current.temp_c}°C\nCondition: ${weatherData.current.condition.text}\n\n3-Day Forecast:\n${forecastDetails}`;
 
     try {
       const response = await axios.post(
