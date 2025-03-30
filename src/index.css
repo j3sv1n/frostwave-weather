@@ -40,7 +40,26 @@ body {
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
   }
-
+  @keyframes borderMove {
+    0% {
+      background-position: 0% 50%;
+      background-color: #000000; /* Black */
+    }
+    50% {
+      background-position: 100% 50%;
+      background-color: #4f4f4f; /* Gray */
+    }
+    100% {
+      background-position: 0% 50%;
+      background-color: #000000; /* Back to Black */
+    }
+  }
+  
+  .animate-borderMove {
+    background: linear-gradient(90deg, #000000, #4f4f4f, #000000);
+    background-size: 200% 200%;
+    animation: borderMove 4s linear infinite;
+  }
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -68,7 +87,12 @@ body {
     --chart-5: 27 87% 67%;
   }
 }
-
+/* Add this to your CSS file */
+.card-hover-glow:hover {
+  box-shadow: 0 4px 20px rgba(1, 204, 255, 0.2);
+  transform: scale(1.05);
+  transition: all 0.3s ease-in-out;
+}
 @layer base {
   * {
     @apply border-border;
