@@ -85,7 +85,65 @@ function App() {
   const convertWindSpeed = (speedKph) => {
     return windSpeedUnit === "mph" ? speedKph * 0.621371 : speedKph;
   };
-
+  const getFoodRecommendations = (condition) => {
+    const lowerCondition = condition.toLowerCase();
+  
+    if (lowerCondition.includes("rain") || lowerCondition.includes("storm")) {
+      return [
+        "Warm chicken soup 🍜 to stay cozy.",
+        "Hot chocolate ☕ or herbal tea 🍵 to keep warm.",
+        "Stay hydrated with at least 2 liters of water 💧.",
+      ];
+    } else if (lowerCondition.includes("snow") || lowerCondition.includes("cold")) {
+      return [
+        "Steaming hot ramen 🍜 or noodle soup.",
+        "Spicy curries 🌶️ to warm yourself up.",
+        "Drink at least 2.5 liters of water 💧 to stay hydrated in the dry air.",
+      ];
+    } else if (lowerCondition.includes("sunny") || lowerCondition.includes("clear")) {
+      return [
+        "Cool off with a refreshing smoothie 🍹 or iced drink 🧊.",
+        "Enjoy a light salad 🥗 with seasonal fruits 🍓.",
+        "Drink at least 3 liters of water 💧 to stay hydrated in the heat.",
+      ];
+    } else if (lowerCondition.includes("cloudy") || lowerCondition.includes("overcast")) {
+      return [
+        "A warm cup of coffee ☕ or tea 🍵.",
+        "Freshly baked cookies 🍪 or a slice of pie 🥧.",
+        "Drink at least 2 liters of water 💧 to maintain hydration.",
+      ];
+    } else if (lowerCondition.includes("windy")) {
+      return [
+        "Hearty sandwiches 🥪 or wraps to enjoy on the go.",
+        "A thermos of hot soup 🍲 to keep warm.",
+        "Drink at least 2 liters of water 💧 to avoid dehydration.",
+      ];
+    } else if (lowerCondition.includes("humid")) {
+      return [
+        "Cold fruit juices 🍊 or coconut water 🥥 to stay refreshed.",
+        "Light meals like sushi 🍣 or fresh salads 🥗.",
+        "Drink at least 3 liters of water 💧 to stay cool.",
+      ];
+    } else if (lowerCondition.includes("fog") || lowerCondition.includes("mist")) {
+      return [
+        "Warm beverages like chai tea 🍵 or hot cocoa ☕.",
+        "Comfort foods like grilled cheese 🧀 and tomato soup 🍅.",
+        "Drink at least 2 liters of water 💧 to stay hydrated.",
+      ];
+    } else if (lowerCondition.includes("haze") || lowerCondition.includes("smoke")) {
+      return [
+        "Avoid heavy meals; opt for light snacks like crackers 🥨 or fruits 🍎.",
+        "Drink herbal teas 🍵 to soothe your throat.",
+        "Stay hydrated with at least 3 liters of water 💧 to combat dryness.",
+      ];
+    } else {
+      return [
+        "Enjoy your favorite comfort food 🍴!",
+        "Stay hydrated 🥤 with a drink of your choice.",
+      ];
+    }
+  };
+// Removed duplicate fetchAiSummary function
   const getWeatherIcon = (condition) => {
     const zinc100Color = "rgb(244, 244, 245)";
     switch (condition.toLowerCase()) {
@@ -266,7 +324,7 @@ function App() {
     console.log(`Fetching weather for location: ${loc}`); 
     try {
       const response = await axios.get(WEATHER_URL, {
-        params: { key: API_KEY, q: loc, days: 3 },
+        params: { key: API_KEY, q: loc, days: 5 },
       });
       console.log("Weather data fetched successfully:", response.data); 
       setWeather(response.data); 
@@ -313,16 +371,25 @@ function App() {
 
   const fetchAiSummary = async (weatherData) => {
     if (!weatherData || !weatherData.forecast || !weatherData.forecast.forecastday) return;
-
+  
     const forecastDetails = weatherData.forecast.forecastday
       .map((day) => {
         const date = new Date(day.date).toLocaleDateString("en-US", { weekday: "long" });
         return `${date}: ${day.day.avgtemp_c}°C, ${day.day.condition.text}`;
       })
       .join("\n");
-
-    const prompt = `Summarize the current weather conditions in a friendly tone. Mention weather conditions (but not the temperature) and give recommendations. Additionally, suggest the best time of the week to visit based on the 3-day forecast and recommend some food options suitable for the weather. Use line breaks to separate the sections. The response shouldn't be too long (not more than 20 words).\n\nLocation: ${weatherData.location.name}\nTemperature: ${weatherData.current.temp_c}°C\nCondition: ${weatherData.current.condition.text}\n\n3-Day Forecast:\n${forecastDetails}`;
-
+  
+    const prompt = `Provide a concise summary of the current weather conditions in a friendly tone. 
+    Include the weather conditions, temperature, and any notable patterns. 
+    Ensure the summary is exactly 50 words long.
+  
+    Location: ${weatherData.location.name}
+    Temperature: ${weatherData.current.temp_c}°C
+    Condition: ${weatherData.current.condition.text}
+  
+    3-Day Forecast:
+    ${forecastDetails}`;
+  
     try {
       const response = await axios.post(
         GEMINI_URL,
@@ -336,7 +403,7 @@ function App() {
           },
         }
       );
-
+  
       if (
         response.data &&
         response.data.candidates &&
@@ -355,7 +422,6 @@ function App() {
       setAiSummary("Could not generate AI summary. Please try again later.");
     }
   };
-  
   const debouncedFetchSearchResults = useCallback(
     debounce((query) => {
       if (query.length >= 3) {
@@ -635,97 +701,98 @@ function App() {
           </AnimatePresence>
         </div>
 
-        {/* <div className="w-full h-[60px] bg-zinc-950 rounded-lg p-2">
-          {hourlyData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={hourlyData}>
-                <XAxis dataKey="time" tick={{ fill: "#f4f4f5", fontSize: 12 }} />
-                <YAxis hide domain={["auto", "auto"]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1c1c1e",
-                    border: "none",
-                    borderRadius: "4px",
-                    color: "#f4f4f5",
-                  }}
-                />
-                <Line type="monotone" dataKey="temp" stroke="#38bdf8" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="text-zinc-400 text-center">No hourly data available</div>
-          )}
-        </div> */}
-    
-        <div className="flex flex-row w-full mt-auto" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[250px] transition-transform duration-30 hover:scale-110">
-            <CardContent>
-              <h3 className="text-xl font-semibold mb-2 pt-1">Quick Summary</h3>
-              {aiSummary ? (
-                <div className="text-base italic pt-2" style={{ textAlign: "justify" }}>
-                  {aiSummary.split("\n\n").map((paragraph, index) => (
-                    <p key={index} className="mb-2">{paragraph}</p>
-                  ))}
-                </div>
-              ) : (
-                <Skeleton className="w-full h-20 rounded pt-2" />
-              )}
-            </CardContent>
-          </Card>
+        <div className="flex flex-row justify-between gap-6 mt-4">
+  {/* Left Column: Quick Summary and Food Recommendations */}
+  <div className="flex flex-col flex-1 gap-3">
+    {/* Quick Summary Card */}
+    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
+      <CardContent>
+        <h3 className="text-lg font-semibold mb-2">Quick Summary</h3>
+        {aiSummary ? (
+          <div className="text-sm italic" style={{ textAlign: "justify" }}>
+            {aiSummary.split("\n\n").map((paragraph, index) => (
+              <p key={index} className="mb-1">🌟 {paragraph}</p>
+            ))}
+          </div>
+        ) : (
+          <Skeleton className="w-full h-16 rounded" />
+        )}
+      </CardContent>
+    </Card>
+    <div></div>
 
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 h-[250px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="overflow-hidden">
-              <h3 className="text-xl font-semibold mb-2">3-Day Forecast</h3>
-              <AnimatePresence mode="wait">
-                {weather?.forecast?.forecastday ? (
-                  <motion.div
-                    key={weather.forecast.forecastday.map((day) => day.date).join(",")} // Trigger animation on forecast change
-                    initial={{ opacity: 0, y: 10 }} // Start animation
-                    animate={{ opacity: 1, y: 0 }} // End animation
-                    exit={{ opacity: 0, y: -10 }} // Exit animation
-                    transition={{ duration: 0.5 }} // Animation duration
-                  >
-                    <Table className="overflow-hidden">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Day</TableHead>
-                          <TableHead>Temp (°C)</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {weather.forecast.forecastday.map((day) => (
-                          <TableRow key={day.date}>
-                            <TableCell>
-                              {new Date(day.date).toLocaleDateString("en-US", {
-                                weekday: "long",
-                              })}
-                            </TableCell>
-                            <TableCell className="flex items-center space-x-2">
-                              <div className="flex items-center justify-center w-8 h-8">
-                                {getWeatherIcon(day.day.condition.text)}
-                              </div>
-                              <span>
-                                {Math.round(convertTemperature(day.day.avgtemp_c))}°
-                                {temperatureUnit}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </motion.div>
-                ) : (
-                  <div className="space-y-2">
-                    <Skeleton className="w-full h-8 rounded" />
-                    <Skeleton className="w-full h-8 rounded" />
-                    <Skeleton className="w-full h-8 rounded" />
-                  </div>
-                )}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
-        </div>
-        
+    {/* Food Recommendations Card */}
+    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
+      <CardContent>
+        <h3 className="text-lg font-semibold mb-2">🍴 Food Recommendations</h3>
+        {weather?.current?.condition?.text ? (
+          <div className="text-sm" style={{ textAlign: "justify" }}>
+            {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
+              <p key={index} className="mb-1">🍽️ {item}</p>
+            ))}
+          </div>
+        ) : (
+          <Skeleton className="w-full h-16 rounded" />
+        )}
+      </CardContent>
+    </Card>
+  </div>
+
+  {/* Right Column: 5-Day Forecast */}
+  <div className="flex-1">
+    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105 h-full">
+      <CardContent>
+        <h3 className="text-lg font-semibold mb-2">5-Day Forecast</h3>
+        <AnimatePresence mode="wait">
+          {weather?.forecast?.forecastday ? (
+            <motion.div
+              key={weather.forecast.forecastday.map((day) => day.date).join(",")}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Table className="overflow-hidden text-sm">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Day</TableHead>
+                    <TableHead>Temp (°C)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {weather.forecast.forecastday.map((day) => (
+                    <TableRow key={day.date}>
+                      <TableCell>
+                        {new Date(day.date).toLocaleDateString("en-US", {
+                          weekday: "long",
+                        })}
+                      </TableCell>
+                      <TableCell className="flex items-center space-x-2">
+                        <div className="flex items-center justify-center w-6 h-6">
+                          {getWeatherIcon(day.day.condition.text)}
+                        </div>
+                        <span>
+                          {Math.round(convertTemperature(day.day.avgtemp_c))}°
+                          {temperatureUnit}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </motion.div>
+          ) : (
+            <div className="space-y-2">
+              <Skeleton className="w-full h-6 rounded" />
+              <Skeleton className="w-full h-6 rounded" />
+              <Skeleton className="w-full h-6 rounded" />
+            </div>
+          )}
+        </AnimatePresence>
+      </CardContent>
+    </Card>
+  </div>
+</div>
         <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
           <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
             <CardContent className="flex flex-row items-center justify-between">
