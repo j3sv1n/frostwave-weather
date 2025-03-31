@@ -78,6 +78,14 @@ const WeatherGlobe = () => {
                     )}
                 </DrawerTrigger>
                 <DrawerContent className="max-h-[95vh] p-4 bg-black text-white">
+                    <div className="absolute top-4 z-10" style={{ left: '17.5%' }}>
+                        <h1 className="text-2xl font-semibold text-zinc-100">Planet Earth</h1>
+                        {globeRef.current && (
+                            <p className="text-sm text-zinc-400">
+                                {globeRef.current.pointOfView().lat.toFixed(7)}, {globeRef.current.pointOfView().lng.toFixed(7)}
+                            </p>
+                        )}
+                    </div>
                     <Globe
                         ref={globeRef}
                         globeImageUrl="/map2.png"

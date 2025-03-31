@@ -1021,13 +1021,13 @@ function App() {
         </div>
     </div>
     <div style={{
-        position: 'fixed',
-        bottom: '50px',
-        right: '70px',  
-        zIndex: 1000,     
-      }}>
+      position: 'fixed',
+      bottom: '50px',
+      right: '70px',  
+      zIndex: 1000,     
+    }}>
         <WeatherGlobe />
-      </div>
+    </div>
   </div>
   );
 }
