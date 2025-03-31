@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frostwave Weather</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- ...existing code... -->
+  <button id="theme-toggle" class="fixed top-4 right-4 p-2 bg-primary text-primary-foreground rounded">
+    Toggle Theme
+  </button>
+  <!-- ...existing code... -->
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>

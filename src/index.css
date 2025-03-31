@@ -4,8 +4,22 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-color-light: #ffffff;
+  --text-color-light: #000000;
+  --bg-color-dark: #18181b;
+  --text-color-dark: #f4f4f5;
+}
+
 html {
   color-scheme: light dark;
+  background-color: var(--bg-color-light);
+  color: var(--text-color-light);
+}
+
+html.dark {
+  background-color: var(--bg-color-dark);
+  color: var(--text-color-dark);
 }
 
 body {
@@ -75,5 +89,11 @@ body {
   }
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+  }
+  html {
+    scroll-behavior: smooth; /* Added smooth scrolling */
+  }
+  .dark body {
+    @apply bg-background text-foreground; /* Ensure dark mode styles apply */
   }
 }

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: ["class"],
+    darkMode: 'class', // Enable class-based dark mode
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
@@ -56,6 +56,6 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate","@codaworks/react-glow/tailwind")],
+  plugins: [],
 }
 

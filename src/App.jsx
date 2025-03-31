@@ -47,7 +47,7 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState("C");
   const [windSpeedUnit, setWindSpeedUnit] = useState("kph");
-  
+  const [theme, setTheme] = useState("dark"); // Add theme state
   
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -77,6 +77,14 @@ function App() {
     Cookies.set("temperatureUnit", temperatureUnit, { expires: 365 });
     Cookies.set("windSpeedUnit", windSpeedUnit, { expires: 365 });
   }, [temperatureUnit, windSpeedUnit]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+  };
 
   const convertTemperature = (tempC) => {
     return temperatureUnit === "F" ? (tempC * 9) / 5 + 32 : tempC;
@@ -145,28 +153,28 @@ function App() {
   };
 // Removed duplicate fetchAiSummary function
   const getWeatherIcon = (condition) => {
-    const zinc100Color = "rgb(244, 244, 245)";
+    const iconColor = theme === "dark" ? "rgb(244, 244, 245)" : "rgb(39, 39, 42)"; // Adjust color based on theme
     switch (condition.toLowerCase()) {
       case "sunny":
       case "clear":
-        return <WiDaySunny size={192} color={zinc100Color} />;
+        return <WiDaySunny size={192} color={iconColor} />;
       case "cloudy":
       case "partly cloudy":
-        return <WiCloud size={192} color={zinc100Color} />;
+        return <WiCloud size={192} color={iconColor} />;
       case "rain":
       case "showers":
-        return <WiRain size={192} color={zinc100Color} />;
+        return <WiRain size={192} color={iconColor} />;
       case "snow":
       case "sleet":
-        return <WiSnow size={192} color={zinc100Color} />;
+        return <WiSnow size={192} color={iconColor} />;
       case "thunderstorm":
       case "storm":
-        return <WiThunderstorm size={192} color={zinc100Color} />;
+        return <WiThunderstorm size={192} color={iconColor} />;
       case "fog":
       case "mist":
-        return <WiFog size={192} color={zinc100Color} />;
+        return <WiFog size={192} color={iconColor} />;
       default:
-        return <WiDaySunny size={192} color={zinc100Color} />;
+        return <WiDaySunny size={192} color={iconColor} />;
     }
   };
 
@@ -451,15 +459,22 @@ function App() {
   };
 
   return (
-    //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
-    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30">
+    <div className={`min-h-screen ${theme === "dark" ? "bg-zinc-950" : "bg-zinc-100"}`}>
       <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col min-h-screen">
         <div className="sticky top-2 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
-            {/* <div className="pt-2">
-              <ThemeToggle />
-            </div> */}
+            <h1 className={`text-3xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-zinc-900"}`}>
+              Frostwave
+            </h1>
+            <div className="pt-2">
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={toggleTheme}
+              />
+              <span className={theme === "dark" ? "text-zinc-100" : "text-zinc-900"}>
+                {theme === "dark" ? "Dark Mode" : "Light Mode"}
+              </span>
+            </div>
             <div className="flex items-center space-x-2 pt-1">
               <Switch
                 checked={musicType === "songs"}
@@ -671,10 +686,14 @@ function App() {
                 transition={{ duration: 0.5 }}
                 className="flex items-center space-x-6"
               >
-                <div className="drop-shadow-lg transition-transform duration-300 hover:drop-shadow-glow" >
+                <div className="drop-shadow-lg transition-transform duration-300 hover:drop-shadow-glow">
                   {getWeatherIcon(weather.current.condition.text)}
                 </div>
-                <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:drop-shadow-glow">
+                <p
+                  className={`text-8xl font-bold ${
+                    theme === "dark" ? "text-zinc-100" : "text-zinc-900"
+                  } fade-in transition-transform duration-30 hover:drop-shadow-glow`}
+                >
                   {Math.round(
                     convertTemperature(
                       weather.current.temp_c % 1 < 0.6
@@ -705,7 +724,7 @@ function App() {
   {/* Left Column: Quick Summary and Food Recommendations */}
   <div className="flex flex-col flex-1 gap-3">
     {/* Quick Summary Card */}
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
+    <Card className={`p-3 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} transition-transform duration-300 hover:scale-105`}>
       <CardContent>
         <h3 className="text-lg font-semibold mb-2">Quick Summary</h3>
         {aiSummary ? (
@@ -722,7 +741,7 @@ function App() {
     <div></div>
 
     {/* Food Recommendations Card */}
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
+    <Card className={`p-3 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} transition-transform duration-300 hover:scale-105`}>
       <CardContent>
         <h3 className="text-lg font-semibold mb-2">🍴 Food Recommendations</h3>
         {weather?.current?.condition?.text ? (
@@ -740,7 +759,7 @@ function App() {
 
   {/* Right Column: 5-Day Forecast */}
   <div className="flex-1">
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105 h-full">
+    <Card className={`p-3 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} transition-transform duration-300 hover:scale-105 h-full`}>
       <CardContent>
         <h3 className="text-lg font-semibold mb-2">5-Day Forecast</h3>
         <AnimatePresence mode="wait">
@@ -794,7 +813,7 @@ function App() {
   </div>
 </div>
         <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
+          <Card className={`flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110`}>
             <CardContent className="flex flex-row items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Humidity</h3>
@@ -815,7 +834,7 @@ function App() {
             </CardContent>
           </Card>
 
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[135px] transition-transform duration-30 hover:scale-110">
+          <Card className={`flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[135px] transition-transform duration-30 hover:scale-110`}>
             <CardContent className="flex flex-row items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">UV Index</h3>
@@ -848,7 +867,7 @@ function App() {
         </div>
 
         <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[220px] transition-transform duration-30 hover:scale-110">
+          <Card className={`flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left mr-4 h-[220px] transition-transform duration-30 hover:scale-110`}>
             <CardContent className="flex flex-row items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
@@ -871,7 +890,7 @@ function App() {
             </CardContent>
           </Card>
 
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] transition-transform duration-30 hover:scale-110">
+          <Card className={`flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[220px] transition-transform duration-30 hover:scale-110`}>
             <CardContent className="flex flex-col justify-center">
               <div className="text-left">
                 <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
