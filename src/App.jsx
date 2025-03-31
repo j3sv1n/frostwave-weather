@@ -143,6 +143,29 @@ function App() {
       ];
     }
   };
+  const addEmojisToSummary = (text) => {
+    const lowerText = text.toLowerCase();
+  
+    if (lowerText.includes("sunny")) {
+      return `☀️ ${text} Don't forget your sunglasses! 😎`;
+    } else if (lowerText.includes("rain")) {
+      return `🌧️ ${text} Grab an umbrella! ☔`;
+    } else if (lowerText.includes("snow")) {
+      return `❄️ ${text} Time for some hot cocoa! ☕`;
+    } else if (lowerText.includes("cloudy")) {
+      return `☁️ ${text} A cozy day for reading indoors! 📚`;
+    } else if (lowerText.includes("windy")) {
+      return `💨 ${text} Hold onto your hat! 🎩`;
+    } else if (lowerText.includes("humid")) {
+      return `💦 ${text} Stay cool and hydrated! 🥤`;
+    } else if (lowerText.includes("fog") || lowerText.includes("mist")) {
+      return `🌫️ ${text} Drive safely in low visibility! 🚗`;
+    } else if (lowerText.includes("haze") || lowerText.includes("smoke")) {
+      return `🌁 ${text} Limit outdoor activities! 🏠`;
+    } else {
+      return `🌈 ${text} Enjoy the day! 🌟`;
+    }
+  };
 // Removed duplicate fetchAiSummary function
   const getWeatherIcon = (condition) => {
     const zinc100Color = "rgb(244, 244, 245)";
@@ -324,7 +347,7 @@ function App() {
     console.log(`Fetching weather for location: ${loc}`); 
     try {
       const response = await axios.get(WEATHER_URL, {
-        params: { key: API_KEY, q: loc, days: 5 },
+        params: { key: API_KEY, q: loc, days: 7 },
       });
       console.log("Weather data fetched successfully:", response.data); 
       setWeather(response.data); 
@@ -381,13 +404,13 @@ function App() {
   
     const prompt = `Provide a concise summary of the current weather conditions in a friendly tone. 
     Include the weather conditions, temperature, and any notable patterns. 
-    Ensure the summary is exactly 50 words long.
+    Ensure the summary is exactly 35 words long. Don't mention the place name or the temperature.
   
     Location: ${weatherData.location.name}
     Temperature: ${weatherData.current.temp_c}°C
     Condition: ${weatherData.current.condition.text}
   
-    3-Day Forecast:
+    7-Day Forecast:
     ${forecastDetails}`;
   
     try {
@@ -701,154 +724,225 @@ function App() {
           </AnimatePresence>
         </div>
 
-        <div className="flex flex-row justify-between gap-6 mt-4">
-  {/* Left Column: Quick Summary and Food Recommendations */}
-  <div className="flex flex-col flex-1 gap-3">
-    {/* Quick Summary Card */}
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">Quick Summary</h3>
-        {aiSummary ? (
-          <div className="text-sm italic" style={{ textAlign: "justify" }}>
-            {aiSummary.split("\n\n").map((paragraph, index) => (
-              <p key={index} className="mb-1">🌟 {paragraph}</p>
-            ))}
-          </div>
-        ) : (
-          <Skeleton className="w-full h-16 rounded" />
-        )}
-      </CardContent>
-    </Card>
-    <div></div>
-
-    {/* Food Recommendations Card */}
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">🍴 Food Recommendations</h3>
-        {weather?.current?.condition?.text ? (
-          <div className="text-sm" style={{ textAlign: "justify" }}>
-            {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
-              <p key={index} className="mb-1">🍽️ {item}</p>
-            ))}
-          </div>
-        ) : (
-          <Skeleton className="w-full h-16 rounded" />
-        )}
-      </CardContent>
-    </Card>
-  </div>
-
-  {/* Right Column: 5-Day Forecast */}
-  <div className="flex-1">
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105 h-full">
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">5-Day Forecast</h3>
-        <AnimatePresence mode="wait">
-          {weather?.forecast?.forecastday ? (
+        <div className="flex flex-row justify-between gap-4 mt-4">
+          {/* Left Column: Quick Summary and Food Recommendations */}
+          <div className="flex flex-col flex-1 gap-3">
+            {/* Quick Summary Card */}
             <motion.div
-              key={weather.forecast.forecastday.map((day) => day.date).join(",")}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.05, y: -5 }} 
+              transition={{ duration: 0.3 }} 
+              className="relative"
             >
-              <Table className="overflow-hidden text-sm">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Day</TableHead>
-                    <TableHead>Temp (°C)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {weather.forecast.forecastday.map((day) => (
-                    <TableRow key={day.date}>
-                      <TableCell>
-                        {new Date(day.date).toLocaleDateString("en-US", {
-                          weekday: "long",
-                        })}
-                      </TableCell>
-                      <TableCell className="flex items-center space-x-2">
-                        <div className="flex items-center justify-center w-6 h-6">
-                          {getWeatherIcon(day.day.condition.text)}
-                        </div>
-                        <span>
-                          {Math.round(convertTemperature(day.day.avgtemp_c))}°
-                          {temperatureUnit}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </motion.div>
-          ) : (
-            <div className="space-y-2">
-              <Skeleton className="w-full h-6 rounded" />
-              <Skeleton className="w-full h-6 rounded" />
-              <Skeleton className="w-full h-6 rounded" />
-            </div>
-          )}
-        </AnimatePresence>
-      </CardContent>
-    </Card>
-  </div>
-</div>
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Humidity</h3>
-                {weather?.current?.humidity ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.humidity}%</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.humidity > 70 ? "High" : "Normal"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiRain className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
+              {/* Background Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(66,135,245,0.3)_0%,_rgba(66,135,245,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">UV Index</h3>
-                {weather?.current?.uv !== undefined ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.uv}</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.uv === 0
-                        ? "Very Low"
-                        : weather.current.uv > 7
-                        ? "High"
-                        : weather.current.uv > 3
-                        ? "Moderate"
-                        : "Low"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiDaySunny
-                  className={`text-6xl ${
-                    weather?.current?.uv > 7 ? "text-red-500" : "text-white"
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
+              {/* Card Content */}
+              <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]">
+                <div className="relative z-10 p-3">
+                  <CardContent>
+                    <h3 className="text-lg font-semibold mb-2">🌟 Quick Summary</h3>
+                    {aiSummary ? (
+                      <div className="text-sm space-y-2" style={{ textAlign: "justify" }}>
+                        {aiSummary.split("\n\n").map((paragraph, index) => (
+                          <p key={index} className="mb-1">
+                            {addEmojisToSummary(paragraph)}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <Skeleton className="w-full h-16 rounded" />
+                    )}
+                  </CardContent>
+                </div>
+              </Card>
+            </motion.div>
+            <div></div>
+
+            {/* Food Recommendations Card */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+              transition={{ duration: 0.3 }} // Smooth transition
+              className="relative"
+            >
+              {/* Background Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(66,135,245,0.3)_0%,_rgba(66,135,245,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+              {/* Card Content */}
+              <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]">
+                <div className="relative z-10 p-3 pb-5">
+                  <CardContent>
+                    <h3 className="text-sm font-semibold mb-1">🍴 Food Recommendations</h3>
+                    {weather?.current?.condition?.text ? (
+                      <div className="text-xs space-y-1" style={{ textAlign: "justify" }}>
+                        {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
+                          <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100 text-sm">
+                            🍽️ {item}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <Skeleton className="w-full h-12 rounded" />
+                    )}
+                  </CardContent>
+                </div>
+              </Card>
+            </motion.div>
         </div>
 
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[220px] transition-transform duration-30 hover:scale-110">
+        {/* Right Column: 7-Day Forecast */}
+        <div className="flex-1">
+          <motion.div
+            whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+            transition={{ duration: 0.3 }} // Smooth transition
+            className="relative"
+          >
+            {/* Background Glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,223,0,0.3)_0%,_rgba(255,223,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+            {/* Card Content */}
+            <Card className="relative p-3 bg-zinc-950 text-zinc-100 text-left h-[385px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,115,52,0.5)] overflow-hidden">
+              <CardContent>
+                <h3 className="text-lg font-semibold mb-2">7-Day Forecast</h3>
+                <AnimatePresence mode="wait">
+                  {weather?.forecast?.forecastday ? (
+                    <motion.div
+                      key={weather.forecast.forecastday.map((day) => day.date).join(",")}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Table className="overflow-hidden text-sm">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Day</TableHead>
+                            <TableHead>Temp (°C)</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {weather.forecast.forecastday.map((day) => (
+                            <TableRow key={day.date}>
+                              <TableCell>
+                                {new Date(day.date).toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                })}
+                              </TableCell>
+                              <TableCell className="flex items-center space-x-2">
+                                <div className="flex items-center justify-center w-6 h-6">
+                                  {getWeatherIcon(day.day.condition.text)}
+                                </div>
+                                <span>
+                                  {Math.round(convertTemperature(day.day.avgtemp_c))}°
+                                  {temperatureUnit}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </motion.div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                    </div>
+                  )}
+                </AnimatePresence>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        </div>
+          {/* Bottom Row: Humidity and UV Index */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Humidity Card */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+              transition={{ duration: 0.3 }} // Smooth transition
+              className="relative"
+            >
+              {/* Background Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(138,43,226,0.3)_0%,_rgba(138,43,226,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+              {/* Card Content */}
+              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(127,159,212,0.5)] overflow-hidden">
+                <CardContent className="flex flex-row items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Humidity</h3>
+                    {weather?.current?.humidity ? (
+                      <div>
+                        <p className="text-4xl font-bold">{weather.current.humidity}%</p>
+                        <p className="text-sm text-zinc-400">
+                          {weather.current.humidity > 70 ? "High" : "Normal"}
+                        </p>
+                      </div>
+                    ) : (
+                      <Skeleton className="w-full h-12 rounded" />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
+                    <WiRain className="text-6xl text-white" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* UV Index Card */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+              transition={{ duration: 0.3 }} // Smooth transition
+            >
+              {/* Background Glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,0,0,0.3)_0%,_rgba(255,0,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+              {/* Card Content */}
+              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,64,52,0.5)] overflow-hidden">
+                <CardContent className="flex flex-row items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">UV Index</h3>
+                    {weather?.current?.uv !== undefined ? (
+                      <div>
+                        <p className="text-4xl font-bold">{weather.current.uv}</p>
+                        <p className="text-sm text-zinc-400">
+                          {weather.current.uv === 0
+                            ? "Very Low"
+                            : weather.current.uv > 7
+                            ? "High"
+                            : weather.current.uv > 3
+                            ? "Moderate"
+                            : "Low"}
+                        </p>
+                      </div>
+                    ) : (
+                      <Skeleton className="w-full h-12 rounded" />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
+                    <WiDaySunny
+                      className={`text-6xl ${
+                        weather?.current?.uv > 7 ? "text-red-500" : "text-white"
+                      }`}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+      </div>
+    
+      <div className="grid grid-cols-2 gap-4">
+        {/* Wind Speed Card */}
+        <motion.div
+          whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+          transition={{ duration: 0.3 }} // Smooth transition
+          className="relative"
+        >
+          {/* Background Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(202,253,243,0.3)_0%,_rgba(202,253,243,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+          {/* Card Content */}
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(202,253,243,0.5)] overflow-hidden">
             <CardContent className="flex flex-row items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
@@ -870,12 +964,23 @@ function App() {
               </div>
             </CardContent>
           </Card>
+        </motion.div>
 
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] transition-transform duration-30 hover:scale-110">
+        {/* Sunrise and Sunset Card */}
+        <motion.div
+          whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+          transition={{ duration: 0.3 }} // Smooth transition
+          className="relative"
+        >
+          {/* Background Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,165,0,0.3)_0%,_rgba(255,165,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+          {/* Card Content */}
+          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,115,52,0.5)] overflow-hidden">
             <CardContent className="flex flex-col justify-center">
               <div className="text-left">
                 <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
-                  <p className="text-sm text-zinc-400">
+                <p className="text-sm text-zinc-400">
                   {weather?.forecast?.forecastday[0]?.astro
                     ? `${calculateDaylightDuration(
                         weather.forecast.forecastday[0].astro.sunrise,
@@ -896,25 +1001,10 @@ function App() {
                         { time: "End", value: 0 },
                       ]}
                     >
-                      {/* X-Axis */}
-                      <XAxis
-                        dataKey="time"
-                        tick={false} // Remove X-Axis labels
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      {/* Y-Axis */}
+                      <XAxis dataKey="time" tick={false} axisLine={false} tickLine={false} />
                       <YAxis hide />
-                      {/* Horizontal Reference Line */}
                       <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
-                      {/* Inverted U Shape */}
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#ffffff" // White for the curve
-                        strokeWidth={2}
-                        dot={false}
-                      />
+                      <Line type="monotone" dataKey="value" stroke="#ffffff" strokeWidth={2} dot={false} />
                     </LineChart>
                   </ResponsiveContainer>
                   <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
@@ -927,10 +1017,10 @@ function App() {
               )}
             </CardContent>
           </Card>
+        </motion.div>
         </div>
-
-      </div>
     </div>
+  </div>
   );
 }
 
