@@ -4,6 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Globe from "react-globe.gl";
 import WeatherGlobe from "@/components/WeatherGlobe";
+import Reminder from "@/components/Reminder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog, WiStrongWin
 import { ChartContainer } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { WiSmoke } from "react-icons/wi";
+import { ToastProvider } from "@/components/ui/toast";
 
 
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
@@ -475,6 +477,7 @@ function App() {
 
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
+    <ToastProvider>
     <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30">
       <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col min-h-screen">
         <div className="sticky top-2 flex justify-between items-center">
@@ -1022,6 +1025,14 @@ function App() {
     </div>
     <div style={{
       position: 'fixed',
+      bottom: '150px',
+      right: '70px',  
+      zIndex: 1000,     
+    }}>
+        <Reminder />
+    </div>
+    <div style={{
+      position: 'fixed',
       bottom: '50px',
       right: '70px',  
       zIndex: 1000,     
@@ -1029,6 +1040,7 @@ function App() {
         <WeatherGlobe />
     </div>
   </div>
+  </ToastProvider>
   );
 }
 
