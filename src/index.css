@@ -43,22 +43,22 @@ body {
   @keyframes borderMove {
     0% {
       background-position: 0% 50%;
-      background-color: #000000; /* Black */
+      background-color: #1a1a1a; /* Darker Black */
     }
     50% {
       background-position: 100% 50%;
-      background-color: #4f4f4f; /* Gray */
+      background-color: #333333; /* Dark Gray */
     }
     100% {
       background-position: 0% 50%;
-      background-color: #000000; /* Back to Black */
+      background-color: #1a1a1a; /* Back to Darker Black */
     }
   }
   
   .animate-borderMove {
-    background: linear-gradient(90deg, #000000, #4f4f4f, #000000);
+    background: linear-gradient(90deg, #1a1a1a, #333333, #1a1a1a);
     background-size: 200% 200%;
-    animation: borderMove 4s linear infinite;
+    animation: borderMove 8s linear infinite; /* Slower animation (8 seconds) */
   }
   .dark {
     --background: 240 10% 3.9%;

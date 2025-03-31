@@ -728,244 +728,295 @@ function App() {
   {/* Left Column: Quick Summary and Food Recommendations */}
   <div className="flex flex-col flex-1 gap-3">
 {/* Quick Summary Card */}
-{/* Example Card with Background Glow Effect */}
-<Card className="p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_20px_5px_rgba(255,0,0,0.5)]">
-  <CardContent>
-    <h3 className="text-lg font-semibold mb-2">🌟 Quick Summary</h3>
-    {aiSummary ? (
-      <div className="text-sm space-y-2" style={{ textAlign: "justify" }}>
-        {aiSummary.split("\n\n").map((paragraph, index) => (
-          <p key={index} className="mb-1">
-            {addEmojisToSummary(paragraph)}
-          </p>
-        ))}
-      </div>
-    ) : (
-      <Skeleton className="w-full h-16 rounded" />
-    )}
-  </CardContent>
+<Card className="relative p-3 bg-green-700 text-zinc-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_20px_5px_rgba(0,255,0,0.5)] overflow-hidden">
+  <div className="absolute inset-0 rounded-lg border-2 border-transparent animate-borderMove"></div>
+  <div className="relative z-10 p-3">
+    <CardContent>
+      <h3 className="text-lg font-semibold mb-2">🌟 Quick Summary</h3>
+      {aiSummary ? (
+        <div className="text-sm space-y-2" style={{ textAlign: "justify" }}>
+          {aiSummary.split("\n\n").map((paragraph, index) => (
+            <p key={index} className="mb-1">
+              {addEmojisToSummary(paragraph)}
+            </p>
+          ))}
+        </div>
+      ) : (
+        <Skeleton className="w-full h-16 rounded" />
+      )}
+    </CardContent>
+  </div>
 </Card>
     <div></div>
 
 {/* Food Recommendations Card */}
-<Card className="relative p-2 bg-zinc-950 text-zinc-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105 overflow-hidden h-[150px]">
-  <div className="absolute inset-0 rounded-lg border-2 border-transparent animate-borderMove"></div>
-  <div className="relative z-10 p-2">
-    <CardContent>
-      <h3 className="text-md font-semibold mb-1">🍴 Food Recommendations</h3>
-      {weather?.current?.condition?.text ? (
-        <div className="text-xs space-y-1" style={{ textAlign: "justify" }}>
-          {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
-            <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100">
-              🍽️ {item}
+<motion.div
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+  className="relative"
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(0,255,0,0.3)_0%,_rgba(0,255,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Card Content */}
+  <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(0,255,0,0.5)] overflow-hidden h-[180px]">
+    <div className="relative z-10 p-3 pb-5">
+      <CardContent>
+        <h3 className="text-sm font-semibold mb-1">🍴 Food Recommendations</h3> {/* Reduced font size */}
+        {weather?.current?.condition?.text ? (
+          <div className="text-xs space-y-1" style={{ textAlign: "justify" }}> {/* Reduced font size */}
+            {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
+              <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100 text-sm"> {/* Reduced font size */}
+                🍽️ {item}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <Skeleton className="w-full h-12 rounded" />
+        )}
+      </CardContent>
+    </div>
+  </Card>
+</motion.div>
+  </div>
+
+{/* Right Column: 7-Day Forecast */}
+<div className="flex-1">
+  <motion.div
+    whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+    transition={{ duration: 0.3 }} // Smooth transition
+    className="relative"
+  >
+    {/* Background Glow */}
+    <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,223,0,0.3)_0%,_rgba(255,223,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+    {/* Card Content */}
+    <Card className="relative p-3 bg-zinc-950 text-zinc-100 text-left h-full rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(255,223,0,0.5)] overflow-hidden">
+      <CardContent>
+        <h3 className="text-lg font-semibold mb-2">7-Day Forecast</h3>
+        <AnimatePresence mode="wait">
+          {weather?.forecast?.forecastday ? (
+            <motion.div
+              key={weather.forecast.forecastday.map((day) => day.date).join(",")}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Table className="overflow-hidden text-sm">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Day</TableHead>
+                    <TableHead>Temp (°C)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {weather.forecast.forecastday.map((day) => (
+                    <TableRow key={day.date}>
+                      <TableCell>
+                        {new Date(day.date).toLocaleDateString("en-US", {
+                          weekday: "long",
+                        })}
+                      </TableCell>
+                      <TableCell className="flex items-center space-x-2">
+                        <div className="flex items-center justify-center w-6 h-6">
+                          {getWeatherIcon(day.day.condition.text)}
+                        </div>
+                        <span>
+                          {Math.round(convertTemperature(day.day.avgtemp_c))}°
+                          {temperatureUnit}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </motion.div>
+          ) : (
+            <div className="space-y-2">
+              <Skeleton className="w-full h-6 rounded" />
+              <Skeleton className="w-full h-6 rounded" />
+              <Skeleton className="w-full h-6 rounded" />
+            </div>
+          )}
+        </AnimatePresence>
+      </CardContent>
+    </Card>
+  </motion.div>
+</div>
+
+</div>
+      {/* Bottom Row: Humidity and UV Index */}
+      <div className="grid grid-cols-2 gap-4">
+{/* Humidity Card */}
+<motion.div
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+  className="relative"
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(138,43,226,0.3)_0%,_rgba(138,43,226,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Card Content */}
+  <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(138,43,226,0.5)] overflow-hidden">
+    <CardContent className="flex flex-row items-center justify-between">
+      <div>
+        <h3 className="text-xl font-semibold mb-2">Humidity</h3>
+        {weather?.current?.humidity ? (
+          <div>
+            <p className="text-4xl font-bold">{weather.current.humidity}%</p>
+            <p className="text-sm text-zinc-400">
+              {weather.current.humidity > 70 ? "High" : "Normal"}
             </p>
-          ))}
+          </div>
+        ) : (
+          <Skeleton className="w-full h-12 rounded" />
+        )}
+      </div>
+      <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
+        <WiRain className="text-6xl text-white" />
+      </div>
+    </CardContent>
+  </Card>
+</motion.div>
+
+{/* UV Index Card */}
+<motion.div
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,0,0,0.3)_0%,_rgba(255,0,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Card Content */}
+  <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(255,0,0,0.5)] overflow-hidden">
+    <CardContent className="flex flex-row items-center justify-between">
+      <div>
+        <h3 className="text-xl font-semibold mb-2">UV Index</h3>
+        {weather?.current?.uv !== undefined ? (
+          <div>
+            <p className="text-4xl font-bold">{weather.current.uv}</p>
+            <p className="text-sm text-zinc-400">
+              {weather.current.uv === 0
+                ? "Very Low"
+                : weather.current.uv > 7
+                ? "High"
+                : weather.current.uv > 3
+                ? "Moderate"
+                : "Low"}
+            </p>
+          </div>
+        ) : (
+          <Skeleton className="w-full h-12 rounded" />
+        )}
+      </div>
+      <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
+        <WiDaySunny
+          className={`text-6xl ${
+            weather?.current?.uv > 7 ? "text-red-500" : "text-white"
+          }`}
+        />
+      </div>
+    </CardContent>
+  </Card>
+</motion.div>
+    </div>
+      
+
+    
+    <div className="grid grid-cols-2 gap-4">
+{/* Wind Speed Card */}
+<motion.div
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+  className="relative"
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(202,253,243,0.3)_0%,_rgba(202,253,243,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Card Content */}
+  <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(202,253,243,0.5)] overflow-hidden">
+    <CardContent className="flex flex-row items-center justify-between">
+      <div>
+        <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
+        {weather?.current?.wind_kph ? (
+          <div>
+            <p className="text-4xl font-bold">
+              {Math.round(convertWindSpeed(weather.current.wind_kph))} {windSpeedUnit}
+            </p>
+            <p className="text-sm text-zinc-400">
+              {convertWindSpeed(weather.current.wind_kph) > 30 ? "Strong" : "Moderate"}
+            </p>
+          </div>
+        ) : (
+          <Skeleton className="w-full h-12 rounded" />
+        )}
+      </div>
+      <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
+        <WiStrongWind className="text-6xl text-white" />
+      </div>
+    </CardContent>
+  </Card>
+</motion.div>
+
+{/* Sunrise and Sunset Card */}
+<motion.div
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+  className="relative"
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,165,0,0.3)_0%,_rgba(255,165,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Card Content */}
+  <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(255,165,0,0.5)] overflow-hidden">
+    <CardContent className="flex flex-col justify-center">
+      <div className="text-left">
+        <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
+        <p className="text-sm text-zinc-400">
+          {weather?.forecast?.forecastday[0]?.astro
+            ? `${calculateDaylightDuration(
+                weather.forecast.forecastday[0].astro.sunrise,
+                weather.forecast.forecastday[0].astro.sunset
+              )} · Daylight`
+            : "Loading..."}
+        </p>
+      </div>
+      {weather?.forecast?.forecastday[0]?.astro ? (
+        <div className="w-full">
+          <ResponsiveContainer width="100%" height={100}>
+            <LineChart
+              data={[
+                { time: "Start", value: 0 },
+                { time: "Sunrise", value: 20 },
+                { time: "Noon", value: 100 },
+                { time: "Sunset", value: 20 },
+                { time: "End", value: 0 },
+              ]}
+            >
+              <XAxis dataKey="time" tick={false} axisLine={false} tickLine={false} />
+              <YAxis hide />
+              <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
+              <Line type="monotone" dataKey="value" stroke="#ffffff" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+          <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
+            <span>{weather.forecast.forecastday[0].astro.sunrise}</span>
+            <span>{weather.forecast.forecastday[0].astro.sunset}</span>
+          </div>
         </div>
       ) : (
         <Skeleton className="w-full h-12 rounded" />
       )}
     </CardContent>
-  </div>
-</Card>
-  </div>
-
- {/* Right Column: 7-Day Forecast */}
-<div className="flex-1">
-  <GlowArea size={300} className="rounded-lg">
-    <Glow color="red">
-      <Card className="p-4 bg-zinc-950 text-zinc-100 rounded-lg shadow-md h-[400px] transition-transform duration-300 hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-red-500 hover:ring-offset-2 hover:ring-offset-zinc-900">
-        <CardContent>
-          <h3 className="text-lg font-semibold mb-2">7-Day Forecast</h3>
-          <AnimatePresence mode="wait">
-            {weather?.forecast?.forecastday ? (
-              <motion.div
-                key={weather.forecast.forecastday.map((day) => day.date).join(",")}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Table className="overflow-hidden text-sm">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Day</TableHead>
-                      <TableHead>Temp (°C)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {weather.forecast.forecastday.map((day) => (
-                      <TableRow key={day.date}>
-                        <TableCell>
-                          {new Date(day.date).toLocaleDateString("en-US", {
-                            weekday: "long",
-                          })}
-                        </TableCell>
-                        <TableCell className="flex items-center space-x-2">
-                          <div className="flex items-center justify-center w-6 h-6">
-                            {getWeatherIcon(day.day.condition.text)}
-                          </div>
-                          <span>
-                            {Math.round(convertTemperature(day.day.avgtemp_c))}°
-                            {temperatureUnit}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </motion.div>
-            ) : (
-              <div className="space-y-2">
-                <Skeleton className="w-full h-6 rounded" />
-                <Skeleton className="w-full h-6 rounded" />
-                <Skeleton className="w-full h-6 rounded" />
-              </div>
-            )}
-          </AnimatePresence>
-        </CardContent>
-      </Card>
-    </Glow>
-  </GlowArea>
+  </Card>
+</motion.div>
 </div>
 </div>
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Humidity</h3>
-                {weather?.current?.humidity ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.humidity}%</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.humidity > 70 ? "High" : "Normal"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiRain className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[135px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">UV Index</h3>
-                {weather?.current?.uv !== undefined ? (
-                  <div>
-                    <p className="text-4xl font-bold">{weather.current.uv}</p>
-                    <p className="text-sm text-zinc-400">
-                      {weather.current.uv === 0
-                        ? "Very Low"
-                        : weather.current.uv > 7
-                        ? "High"
-                        : weather.current.uv > 3
-                        ? "Moderate"
-                        : "Low"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiDaySunny
-                  className={`text-6xl ${
-                    weather?.current?.uv > 7 ? "text-red-500" : "text-white"
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[220px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-row items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
-                {weather?.current?.wind_kph ? (
-                  <div>
-                    <p className="text-4xl font-bold">
-                      {Math.round(convertWindSpeed(weather.current.wind_kph))} {windSpeedUnit}
-                    </p>
-                    <p className="text-sm text-zinc-400">
-                      {convertWindSpeed(weather.current.wind_kph) > 30 ? "Strong" : "Moderate"}
-                    </p>
-                  </div>
-                ) : (
-                  <Skeleton className="w-full h-12 rounded" />
-                )}
-              </div>
-              <div className="flex items-center justify-center w-20 h-20 bg-zinc-800 rounded-full">
-                <WiStrongWind className="text-6xl text-white" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] transition-transform duration-30 hover:scale-110">
-            <CardContent className="flex flex-col justify-center">
-              <div className="text-left">
-                <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
-                  <p className="text-sm text-zinc-400">
-                  {weather?.forecast?.forecastday[0]?.astro
-                    ? `${calculateDaylightDuration(
-                        weather.forecast.forecastday[0].astro.sunrise,
-                        weather.forecast.forecastday[0].astro.sunset
-                      )} · Daylight`
-                    : "Loading..."}
-                </p>
-              </div>
-              {weather?.forecast?.forecastday[0]?.astro ? (
-                <div className="w-full">
-                  <ResponsiveContainer width="100%" height={100}>
-                    <LineChart
-                      data={[
-                        { time: "Start", value: 0 },
-                        { time: "Sunrise", value: 20 },
-                        { time: "Noon", value: 100 },
-                        { time: "Sunset", value: 20 },
-                        { time: "End", value: 0 },
-                      ]}
-                    >
-                      {/* X-Axis */}
-                      <XAxis
-                        dataKey="time"
-                        tick={false} // Remove X-Axis labels
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      {/* Y-Axis */}
-                      <YAxis hide />
-                      {/* Horizontal Reference Line */}
-                      <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
-                      {/* Inverted U Shape */}
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#ffffff" // White for the curve
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                  <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
-                    <span>{weather.forecast.forecastday[0].astro.sunrise}</span>
-                    <span>{weather.forecast.forecastday[0].astro.sunset}</span>
-                  </div>
-                </div>
-              ) : (
-                <Skeleton className="w-full h-12 rounded" />
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        
 
       </div>
-    </div>
+    
   );
 }
 
