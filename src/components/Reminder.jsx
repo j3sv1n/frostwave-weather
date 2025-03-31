@@ -18,13 +18,12 @@ import { Bell, Calendar as CalendarIcon } from "lucide-react";
 import Cookies from "js-cookie";
 
 const Reminder = ({ weather, fetchWeather }) => {
-  const [showReminderCalendar, setShowReminderCalendar] = useState(false);
-  const [reminderDate, setReminderDate] = useState(null);
   const [showReminderDialog, setShowReminderDialog] = useState(false);
+  const [reminderDate, setReminderDate] = useState(null);
   const [reminderName, setReminderName] = useState("");
   const [reminderDescription, setReminderDescription] = useState("");
-  const [showPreviewCalendar, setShowPreviewCalendar] = useState(false);
   const { toast } = useToast();
+  const [selectedDateReminders, setSelectedDateReminders] = useState([]);
 
   const saveReminder = () => {
     if (reminderDate && reminderName && reminderDescription) {
@@ -50,6 +49,7 @@ const Reminder = ({ weather, fetchWeather }) => {
         title: "Reminder Created!",
         description: "Your reminder has been successfully created.",
       });
+      setShowReminderDialog(false); // Close the dialog after saving
     }
   };
 
@@ -109,20 +109,15 @@ const Reminder = ({ weather, fetchWeather }) => {
     return {};
   }, []);
 
-  const renderPreviewCalendarDay = (date) => {
-    const remindersForDate = getRemindersForCalendar()[date.toISOString().split("T")[0]];
-    return remindersForDate ? (
-      <Button variant="link" onClick={() => console.log("Reminders for this date:", remindersForDate)}>
-        {date.getDate()}
-      </Button>
-    ) : (
-      date.getDate()
-    );
+  const handleDateClick = (date) => {
+    setReminderDate(date);
+    const reminders = getRemindersForCalendar()[date.toISOString().split("T")[0]] || [];
+    setSelectedDateReminders(reminders);
   };
 
   return (
     <div>
-      <Dialog open={showReminderCalendar} onOpenChange={setShowReminderCalendar}>
+      <Dialog open={showReminderDialog} onOpenChange={setShowReminderDialog}>
         <DialogTrigger asChild>
           <Button variant="outline" className="ml-2 p-2">
             <Bell className="w-4 h-4" />
@@ -130,46 +125,70 @@ const Reminder = ({ weather, fetchWeather }) => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reminder</DialogTitle>
+            <DialogTitle>
+              Reminders
+              {reminderDate && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2"
+                  onClick={() => {
+                    setSelectedDateReminders([]);
+                    setReminderDate(null);
+                  }}
+                >
+                  Clear Date
+                </Button>
+              )}
+            </DialogTitle>
           </DialogHeader>
-          <Calendar mode="single" selected={reminderDate} onSelect={setReminderDate} />
-          <DialogFooter>
-            <Button onClick={() => { setShowReminderDialog(true); setShowReminderCalendar(false); }}>
-              Set Reminder
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showReminderDialog} onOpenChange={setShowReminderDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Set Reminder Details</DialogTitle>
-          </DialogHeader>
+          <Calendar
+            mode="single"
+            selected={reminderDate}
+            onSelect={(date) => handleDateClick(date)}
+          />
+          {reminderDate && (
+            <div>
+              <h4 className="font-semibold mt-4">
+                Reminders for {reminderDate.toLocaleDateString()}
+              </h4>
+              {selectedDateReminders.length > 0 ? (
+                <ul>
+                  {selectedDateReminders.map((reminder, index) => (
+                    <li key={index}>
+                      {reminder.name} - {reminder.description}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No reminders for this date.</p>
+              )}
+            </div>
+          )}
           <div className="grid gap-4 py-4">
             <Label htmlFor="name" className="text-right">Reminder Name</Label>
-            <Input id="name" value={reminderName} onChange={(e) => setReminderName(e.target.value)} />
+            <Input
+              id="name"
+              value={reminderName}
+              onChange={(e) => setReminderName(e.target.value)}
+              className="col-span-3"
+            />
             <Label htmlFor="description" className="text-right">Description</Label>
-            <Textarea id="description" value={reminderDescription} onChange={(e) => setReminderDescription(e.target.value)} />
+            <Textarea
+              id="description"
+              value={reminderDescription}
+              onChange={(e) => setReminderDescription(e.target.value)}
+              className="col-span-3"
+            />
           </div>
           <DialogFooter>
-            <Button onClick={() => { saveReminder(); setShowReminderDialog(false); }}>
+            <Button onClick={() => setShowReminderDialog(false)}>
+              Close
+            </Button>
+            <Button onClick={saveReminder}>
               Save Reminder
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Button variant="outline" className="ml-2 p-2" onClick={() => setShowPreviewCalendar(true)}>
-        <CalendarIcon className="w-4 h-4" /> Preview Reminders
-      </Button>
-
-      <Dialog open={showPreviewCalendar} onOpenChange={setShowPreviewCalendar}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Pending Reminders</DialogTitle>
-          </DialogHeader>
-          <Calendar renderDay={renderPreviewCalendarDay} />
         </DialogContent>
       </Dialog>
       <Toast />
