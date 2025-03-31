@@ -1070,7 +1070,7 @@ function App() {
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke="#ffffff"
+                          stroke={theme === "dark" ? "#ffffff" : "#27272a"} //  "#ffffff" for dark mode, "#27272a" for light mode
                           strokeWidth={2}
                           dot={false}
                         />
