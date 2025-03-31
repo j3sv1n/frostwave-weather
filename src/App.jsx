@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { debounce } from "lodash";
 import axios from "axios";
 import Cookies from "js-cookie";
-import sunLogo from '/sun.svg';
+import Globe from "react-globe.gl";
+import WeatherGlobe from "@/components/WeatherGlobe";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { Toggle } from "@/components/ui/toggle"
 import { Switch } from "@/components/ui/switch"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { GlowArea, Glow } from "@/components/Glow"
 import { Sun, Moon } from "lucide-react";
@@ -64,7 +66,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Load saved preferences from cookies
     const savedTempUnit = Cookies.get("temperatureUnit");
     const savedWindUnit = Cookies.get("windSpeedUnit");
 
@@ -72,7 +73,6 @@ function App() {
     if (savedWindUnit) setWindSpeedUnit(savedWindUnit);
   }, []);
 
-  // Single useEffect for saving to cookies when the state changes
   useEffect(() => {
     Cookies.set("temperatureUnit", temperatureUnit, { expires: 365 });
     Cookies.set("windSpeedUnit", windSpeedUnit, { expires: 365 });
