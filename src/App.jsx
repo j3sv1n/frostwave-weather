@@ -29,7 +29,6 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceL
 import { WiSmoke } from "react-icons/wi";
 import { ToastProvider } from "@/components/ui/toast";
 
-
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
 const WEATHER_URL = import.meta.env.VITE_WEATHER_URL;
@@ -52,6 +51,7 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState("C");
   const [windSpeedUnit, setWindSpeedUnit] = useState("kph");
+  const [theme, setTheme] = useState("dark");
   
   
   useEffect(() => {
@@ -67,6 +67,20 @@ function App() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+    getUserLocation();
+    const savedFavorites = Cookies.get("favorites");
+    if (savedFavorites) {
+      try {
+        setFavorites(JSON.parse(savedFavorites));
+      } catch (error) {
+        console.error("Error parsing favorites from cookies:", error);
+        setFavorites([]);
+      }
+    }
+    }, []);
 
   useEffect(() => {
     const savedTempUnit = Cookies.get("temperatureUnit");
@@ -88,6 +102,14 @@ function App() {
   const convertWindSpeed = (speedKph) => {
     return windSpeedUnit === "mph" ? speedKph * 0.621371 : speedKph;
   };
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+    };
 
   const getFoodRecommendations = async (weatherData) => {
     if (!weatherData || !weatherData.current) return;
@@ -164,6 +186,8 @@ function App() {
 // Removed duplicate fetchAiSummary function
   const getWeatherIcon = (condition) => {
     const zinc100Color = "rgb(244, 244, 245)";
+    const iconColor = theme === "dark" ?
+      "rgb(244, 244, 245)" : "rgb(39, 39, 42)";
     switch (condition.toLowerCase()) {
       case "sunny":
       case "clear":
@@ -500,11 +524,13 @@ function App() {
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
     <ToastProvider>
-    <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30">
+    <div className={`min-h-screen ${theme === "dark" ? "bg-zinc-950" : "bg-zinc-100"}`}>
       <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col min-h-screen">
         <div className="sticky top-2 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <h1 className="text-3xl font-bold text-zinc-100">Frostwave</h1>
+            <h1 className={`text-3xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-zinc-900"}`}>
+                Frostwave
+            </h1>
             {/* <div className="pt-2">
               <ThemeToggle />
             </div> */}
@@ -682,6 +708,17 @@ function App() {
               >
                 <div className="flex flex-col space-y-6 ml-0">
                   <h2 className="text-2xl font-bold">Settings</h2>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium">Theme</span>
+                    <Switch
+                      checked={theme === "dark"}
+                      onCheckedChange={toggleTheme}
+                    />
+                    <span className={theme === "dark" ? "text-zinc-100" : "text-zinc-900"}>
+                      {theme === "dark" ? "Dark Mode" : "Light Mode"}
+                    </span>
+                  </div>
                   
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-medium">Temperature Units</span>
@@ -702,6 +739,7 @@ function App() {
                       </TabsList>
                     </Tabs>
                   </div>
+
                 </div>
               </SheetContent>
             </Sheet>
@@ -762,7 +800,7 @@ function App() {
               <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(66,135,245,0.3)_0%,_rgba(66,135,245,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
               {/* Card Content */}
-              <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]">
+              <Card className='relative p-3 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]'>
                 <div className="relative z-10 p-3">
                   <CardContent>
                     <h3 className="text-lg font-semibold mb-2">🌟 Quick Summary</h3>
@@ -793,7 +831,7 @@ function App() {
               <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(66,135,245,0.3)_0%,_rgba(66,135,245,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
               {/* Card Content */}
-              <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]">
+              <Card className='relative p-3 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]'>
                 <div className="relative z-10 p-3 pb-5">
                   <CardContent>
                     <h3 className="text-lg font-semibold mb-1">🍴 Food Recommendations</h3>
@@ -825,7 +863,7 @@ function App() {
             <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,223,0,0.3)_0%,_rgba(255,223,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
             {/* Card Content */}
-            <Card className="relative p-3 bg-zinc-950 text-zinc-100 text-left h-[385px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,115,52,0.5)] overflow-hidden">
+            <Card className='relative p-3 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[385px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,115,52,0.5)] overflow-hidden'>
               <CardContent>
                 <h3 className="text-lg font-semibold mb-2">7-Day Forecast</h3>
                 <AnimatePresence mode="wait">
@@ -892,7 +930,7 @@ function App() {
               <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(138,43,226,0.3)_0%,_rgba(138,43,226,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
               {/* Card Content */}
-              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[145px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(127,159,212,0.5)] overflow-hidden">
+              <Card className='flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[145px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(127,159,212,0.5)] overflow-hidden'>
                 <CardContent className="flex flex-row items-center justify-between">
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Humidity</h3>
@@ -923,7 +961,7 @@ function App() {
               <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,0,0,0.3)_0%,_rgba(255,0,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
               {/* Card Content */}
-              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[145px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,64,52,0.5)] overflow-hidden">
+              <Card className='flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[145px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,64,52,0.5)] overflow-hidden'>
                 <CardContent className="flex flex-row items-center justify-between">
                   <div>
                     <h3 className="text-xl font-semibold mb-2">UV Index</h3>
@@ -967,7 +1005,7 @@ function App() {
           <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(202,253,243,0.3)_0%,_rgba(202,253,243,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
           {/* Card Content */}
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(202,253,243,0.5)] overflow-hidden">
+          <Card className='flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(202,253,243,0.5)] overflow-hidden'>
             <CardContent className="flex flex-row items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Wind Speed</h3>
@@ -1001,7 +1039,7 @@ function App() {
           <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,165,0,0.3)_0%,_rgba(255,165,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
           {/* Card Content */}
-          <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,115,52,0.5)] overflow-hidden">
+          <Card className='flex-1 p-4 ${theme === "dark" ? "bg-zinc-950 text-zinc-100" : "bg-zinc-100 text-zinc-900"} text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,115,52,0.5)] overflow-hidden'>
             <CardContent className="flex flex-col justify-center">
               <div className="text-left">
                 <h3 className="text-xl font-semibold mb-2">Sunrise & Sunset</h3>
