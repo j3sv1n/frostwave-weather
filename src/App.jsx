@@ -183,32 +183,30 @@ function App() {
       return `🌈 ${text} Enjoy the day! 🌟`;
     }
   };
-// Removed duplicate fetchAiSummary function
+
   const getWeatherIcon = (condition) => {
-    const zinc100Color = "rgb(244, 244, 245)";
-    const iconColor = theme === "dark" ?
-      "rgb(244, 244, 245)" : "rgb(39, 39, 42)";
+    const iconColor = theme === "dark" ? "rgb(244, 244, 245)" : "rgb(39, 39, 42)";
     switch (condition.toLowerCase()) {
       case "sunny":
       case "clear":
-        return <WiDaySunny size={192} color={zinc100Color} />;
+        return <WiDaySunny size={192} color={iconColorColor} />;
       case "cloudy":
       case "partly cloudy":
-        return <WiCloud size={192} color={zinc100Color} />;
+        return <WiCloud size={192} color={iconColor} />;
       case "rain":
       case "showers":
-        return <WiRain size={192} color={zinc100Color} />;
+        return <WiRain size={192} color={iconColor} />;
       case "snow":
       case "sleet":
-        return <WiSnow size={192} color={zinc100Color} />;
+        return <WiSnow size={192} color={iconColor} />;
       case "thunderstorm":
       case "storm":
-        return <WiThunderstorm size={192} color={zinc100Color} />;
+        return <WiThunderstorm size={192} color={iconColor} />;
       case "fog":
       case "mist":
-        return <WiFog size={192} color={zinc100Color} />;
+        return <WiFog size={192} color={iconColor} />;
       default:
-        return <WiDaySunny size={192} color={zinc100Color} />;
+        return <WiDaySunny size={192} color={iconColor} />;
     }
   };
 
@@ -524,6 +522,7 @@ function App() {
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
     <ToastProvider>
+    {/* <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30"> */}
     <div className={`min-h-screen ${theme === "dark" ? "bg-zinc-950" : "bg-zinc-100"}`}>
       <div className="max-w-[65%] mx-auto px-0 py-6 space-y-6 flex flex-col min-h-screen">
         <div className="sticky top-2 flex justify-between items-center">
@@ -549,7 +548,7 @@ function App() {
                   }
                 }}
               />
-              <span className="text-zinc-100">
+              <span className='${theme === "dark" ? "text-zinc-100" : "text-zinc-900"}'>
                 {musicType === "ambient" ? "Ambient" : "Songs"}
               </span>
             </div>
@@ -760,7 +759,7 @@ function App() {
                 <div className="drop-shadow-lg transition-transform duration-300 hover:drop-shadow-glow" >
                   {getWeatherIcon(weather.current.condition.text)}
                 </div>
-                <p className="text-8xl font-bold text-zinc-100 fade-in transition-transform duration-30 hover:drop-shadow-glow">
+                <p className='text-8xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-zinc-900"} fade-in transition-transform duration-30 hover:drop-shadow-glow'>
                   {Math.round(
                     convertTemperature(
                       weather.current.temp_c % 1 < 0.6
