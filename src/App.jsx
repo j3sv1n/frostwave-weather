@@ -143,7 +143,6 @@ function App() {
       ];
     }
   };
-// Removed duplicate fetchAiSummary function
   const getWeatherIcon = (condition) => {
     const zinc100Color = "rgb(244, 244, 245)";
     switch (condition.toLowerCase()) {
