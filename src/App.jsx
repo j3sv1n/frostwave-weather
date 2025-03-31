@@ -1020,14 +1020,32 @@ function App() {
         </motion.div>
         </div>
     </div>
-    <div style={{
-        position: 'fixed',
-        bottom: '50px',
-        right: '70px',  
-        zIndex: 1000,     
-      }}>
-        <WeatherGlobe />
-      </div>
+    import { motion } from "framer-motion"; // Ensure this import is at the top of your file
+
+    import { motion } from "framer-motion"; // Ensure this import is at the top of your file
+
+<motion.div
+  style={{
+    position: 'fixed',
+    bottom: '50px',
+    right: '70px',
+    zIndex: 1000,
+  }}
+  className="group relative"
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(66,135,245,0.3)_0%,_rgba(66,135,245,0)_70%)] rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Glassing Effect */}
+  <div className="absolute inset-0 rounded-full bg-[rgba(234, 220, 22, 0.1)] backdrop-blur-md border border-[rgba(213, 239, 48, 0.2)] opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+  {/* Button Content */}
+  <div className="relative z-10 p-3 bg-zinc-950 rounded-full shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] transition-shadow duration-300">
+    <WeatherGlobe />
+  </div>
+</motion.div>
   </div>
   );
 }

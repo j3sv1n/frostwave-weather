@@ -92,6 +92,23 @@ body {
   box-shadow: 0 4px 20px rgba(1, 204, 255, 0.2);
   transform: scale(1.05);
   transition: all 0.3s ease-in-out;
+}@keyframes light-move {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(50%, 50%) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+}
+
+.animate-light-move {
+  animation: light-move 3s infinite ease-in-out;
 }
 @layer base {
   * {
