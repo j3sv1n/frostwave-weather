@@ -42,9 +42,10 @@ const WeatherGlobe = () => {
             });
             console.log("Weather data fetched successfully:", response.data);
             setHoverData({
-                temperature: response.data.current.temp_c,
+                temperature: response.data?.current?.temp_c,
                 lat: parseFloat(loc.split(",")[0]),
                 lng: parseFloat(loc.split(",")[1]),
+                locationName: response.data?.location?.name,
             });
         } catch (error) {
             console.error("Error fetching weather:", error);
@@ -97,8 +98,17 @@ const WeatherGlobe = () => {
                                     📍
                                 </div>
                             </PopoverTrigger>
-                            <PopoverContent className="w-24 h-12 flex items-center justify-center p-2 text-xl font-bold text-zinc-100 bg-zinc-900 rounded-lg shadow-lg">
-                                {hoverData.temperature}°C
+                            <PopoverContent className="w-32 h-20 flex flex-col items-center justify-center p-2 text-xl font-bold text-zinc-100 bg-zinc-900 rounded-lg shadow-lg">
+                                {hoverData.temperature && (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div>{hoverData.temperature}°C</div>
+                                        {hoverData.locationName && (
+                                            <p className="text-sm font-normal mt-1">
+                                                {hoverData.locationName}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
                             </PopoverContent>
                         </Popover>
                     )}
