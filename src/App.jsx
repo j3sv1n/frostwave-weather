@@ -728,28 +728,6 @@ function App() {
   {/* Left Column: Quick Summary and Food Recommendations */}
   <div className="flex flex-col flex-1 gap-3">
 {/* Quick Summary Card */}
-<Card className="relative p-3 bg-green-700 text-zinc-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_20px_5px_rgba(0,255,0,0.5)] overflow-hidden">
-  <div className="absolute inset-0 rounded-lg border-2 border-transparent animate-borderMove"></div>
-  <div className="relative z-10 p-3">
-    <CardContent>
-      <h3 className="text-lg font-semibold mb-2">🌟 Quick Summary</h3>
-      {aiSummary ? (
-        <div className="text-sm space-y-2" style={{ textAlign: "justify" }}>
-          {aiSummary.split("\n\n").map((paragraph, index) => (
-            <p key={index} className="mb-1">
-              {addEmojisToSummary(paragraph)}
-            </p>
-          ))}
-        </div>
-      ) : (
-        <Skeleton className="w-full h-16 rounded" />
-      )}
-    </CardContent>
-  </div>
-</Card>
-    <div></div>
-
-{/* Food Recommendations Card */}
 <motion.div
   whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
   transition={{ duration: 0.3 }} // Smooth transition
@@ -760,13 +738,44 @@ function App() {
 
   {/* Card Content */}
   <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(0,255,0,0.5)] overflow-hidden h-[180px]">
+    <div className="relative z-10 p-3">
+      <CardContent>
+        <h3 className="text-lg font-semibold mb-2">🌟 Quick Summary</h3>
+        {aiSummary ? (
+          <div className="text-sm space-y-2" style={{ textAlign: "justify" }}>
+            {aiSummary.split("\n\n").map((paragraph, index) => (
+              <p key={index} className="mb-1">
+                {addEmojisToSummary(paragraph)}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <Skeleton className="w-full h-16 rounded" />
+        )}
+      </CardContent>
+    </div>
+  </Card>
+</motion.div>
+    <div></div>
+
+{/* Food Recommendations Card */}
+<motion.div
+  whileHover={{ scale: 1.05, y: -5 }} // Scale up and move slightly upward on hover
+  transition={{ duration: 0.3 }} // Smooth transition
+  className="relative"
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(0,0,255,0.3)_0%,_rgba(0,0,255,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+  {/* Card Content */}
+  <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(0,0,255,0.5)] overflow-hidden h-[180px]">
     <div className="relative z-10 p-3 pb-5">
       <CardContent>
-        <h3 className="text-sm font-semibold mb-1">🍴 Food Recommendations</h3> {/* Reduced font size */}
+        <h3 className="text-sm font-semibold mb-1">🍴 Food Recommendations</h3>
         {weather?.current?.condition?.text ? (
-          <div className="text-xs space-y-1" style={{ textAlign: "justify" }}> {/* Reduced font size */}
+          <div className="text-xs space-y-1" style={{ textAlign: "justify" }}>
             {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
-              <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100 text-sm"> {/* Reduced font size */}
+              <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100 text-sm">
                 🍽️ {item}
               </p>
             ))}
