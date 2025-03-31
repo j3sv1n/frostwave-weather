@@ -385,8 +385,36 @@ function App() {
       }));
   };
 
-  const hourlyData = getHourlyForecastData();
+  const [hourlyData, setHourlyData] = useState([]);
+  const [isGraphVisible, setIsGraphVisible] = useState(false);
+  const graphRef = useRef(null);
   console.log("Hourly Data:", hourlyData);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsGraphVisible(true);
+            observer.unobserve(entry.target); // Observe only once
+          }
+        });
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the element is visible
+      }
+    );
+
+    if (graphRef.current) {
+      observer.observe(graphRef.current);
+    }
+
+    return () => {
+      if (graphRef.current) {
+        observer.unobserve(graphRef.current);
+      }
+    };
+  }, []);
 
   const fetchAiSummary = async (weatherData) => {
     if (!weatherData || !weatherData.forecast || !weatherData.forecast.forecastday) return;
@@ -986,32 +1014,73 @@ function App() {
                     : "Loading..."}
                 </p>
               </div>
-              {weather?.forecast?.forecastday[0]?.astro ? (
-                <div className="w-full">
-                  <ResponsiveContainer width="100%" height={100}>
-                    <LineChart
-                      data={[
-                        { time: "Start", value: 0 },
-                        { time: "Sunrise", value: 20 },
-                        { time: "Noon", value: 100 },
-                        { time: "Sunset", value: 20 },
-                        { time: "End", value: 0 },
-                      ]}
-                    >
-                      <XAxis dataKey="time" tick={false} axisLine={false} tickLine={false} />
-                      <YAxis hide />
-                      <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
-                      <Line type="monotone" dataKey="value" stroke="#ffffff" strokeWidth={2} dot={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                  <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
-                    <span>{weather.forecast.forecastday[0].astro.sunrise}</span>
-                    <span>{weather.forecast.forecastday[0].astro.sunset}</span>
+              <div ref={graphRef}>
+                {isGraphVisible ? (
+                  <>
+                    <ResponsiveContainer width="100%" height={100}>
+                      <LineChart
+                        data={[
+                          { time: "Start", value: 0 },
+                          { time: "Sunrise", value: 20 },
+                          { time: "Noon", value: 100 },
+                          { time: "Sunset", value: 20 },
+                          { time: "End", value: 0 },
+                        ]}
+                      >
+                        <XAxis dataKey="time" tick={false} axisLine={false} tickLine={false} />
+                        <YAxis hide />
+                        <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#ffffff"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                    <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
+                      <span>{weather?.forecast?.forecastday[0]?.astro?.sunrise}</span>
+                      <span>{weather?.forecast?.forecastday[0]?.astro?.sunset}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    {weather?.forecast?.forecastday[0]?.astro ? (
+                      <>
+                        <ResponsiveContainer width="100%" height={100}>
+                          <LineChart
+                            data={[
+                              { time: "Start", value: 0 },
+                              { time: "Sunrise", value: 20 },
+                              { time: "Noon", value: 100 },
+                              { time: "Sunset", value: 20 },
+                              { time: "End", value: 0 },
+                            ]}
+                          >
+                            <XAxis dataKey="time" tick={false} axisLine={false} tickLine={false} />
+                            <YAxis hide />
+                            <ReferenceLine y={50} stroke="#6b7280" strokeWidth={1} />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#ffffff"
+                              strokeWidth={2}
+                              dot={false}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                        <div className="flex justify-between items-center text-sm text-zinc-400 mt-1">
+                          <span>{weather?.forecast?.forecastday[0]?.astro?.sunrise}</span>
+                          <span>{weather?.forecast?.forecastday[0]?.astro?.sunset}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <Skeleton className="w-full h-12 rounded" />
+                    )}
                   </div>
-                </div>
-              ) : (
-                <Skeleton className="w-full h-12 rounded" />
-              )}
+                )}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
