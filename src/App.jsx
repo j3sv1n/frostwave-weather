@@ -496,10 +496,6 @@ function App() {
             </AnimatePresence>
           </div>
 
-          <div>
-            <WeatherGlobe />
-          </div>
-
           <div className="flex items-center space-x-2">
             <Popover>
               <PopoverTrigger asChild>
@@ -927,7 +923,14 @@ function App() {
             </CardContent>
           </Card>
         </div>
-
+      </div>
+      <div style={{
+        position: 'fixed',
+        bottom: '50px', // Adjust as needed
+        right: '70px',  // Adjust as needed
+        zIndex: 1000,     // Ensure it floats above other elements
+      }}>
+        <WeatherGlobe />
       </div>
     </div>
   );
