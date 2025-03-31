@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { debounce } from "lodash";
 import axios from "axios";
 import Cookies from "js-cookie";
-import sunLogo from '/sun.svg';
+import Globe from "react-globe.gl";
+import WeatherGlobe from "@/components/WeatherGlobe";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import { Toggle } from "@/components/ui/toggle"
 import { Switch } from "@/components/ui/switch"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { GlowArea, Glow } from "@/components/Glow"
 import { Sun, Moon } from "lucide-react";
@@ -64,7 +66,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Load saved preferences from cookies
     const savedTempUnit = Cookies.get("temperatureUnit");
     const savedWindUnit = Cookies.get("windSpeedUnit");
 
@@ -72,7 +73,6 @@ function App() {
     if (savedWindUnit) setWindSpeedUnit(savedWindUnit);
   }, []);
 
-  // Single useEffect for saving to cookies when the state changes
   useEffect(() => {
     Cookies.set("temperatureUnit", temperatureUnit, { expires: 365 });
     Cookies.set("windSpeedUnit", windSpeedUnit, { expires: 365 });
@@ -497,6 +497,10 @@ function App() {
             </AnimatePresence>
           </div>
 
+          <div>
+            <WeatherGlobe />
+          </div>
+
           <div className="flex items-center space-x-2">
             <Popover>
               <PopoverTrigger asChild>
@@ -702,97 +706,93 @@ function App() {
         </div>
 
         <div className="flex flex-row justify-between gap-6 mt-4">
-  {/* Left Column: Quick Summary and Food Recommendations */}
-  <div className="flex flex-col flex-1 gap-3">
-    {/* Quick Summary Card */}
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">Quick Summary</h3>
-        {aiSummary ? (
-          <div className="text-sm italic" style={{ textAlign: "justify" }}>
-            {aiSummary.split("\n\n").map((paragraph, index) => (
-              <p key={index} className="mb-1">🌟 {paragraph}</p>
-            ))}
-          </div>
-        ) : (
-          <Skeleton className="w-full h-16 rounded" />
-        )}
-      </CardContent>
-    </Card>
-    <div></div>
+          <div className="flex flex-col flex-1 gap-3">
+            <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
+              <CardContent>
+                <h3 className="text-lg font-semibold mb-2">Quick Summary</h3>
+                {aiSummary ? (
+                  <div className="text-sm italic" style={{ textAlign: "justify" }}>
+                    {aiSummary.split("\n\n").map((paragraph, index) => (
+                      <p key={index} className="mb-1">🌟 {paragraph}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <Skeleton className="w-full h-16 rounded" />
+                )}
+              </CardContent>
+            </Card>
+            <div></div>
 
-    {/* Food Recommendations Card */}
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">🍴 Food Recommendations</h3>
-        {weather?.current?.condition?.text ? (
-          <div className="text-sm" style={{ textAlign: "justify" }}>
-            {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
-              <p key={index} className="mb-1">🍽️ {item}</p>
-            ))}
+            <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105">
+              <CardContent>
+                <h3 className="text-lg font-semibold mb-2">🍴 Food Recommendations</h3>
+                {weather?.current?.condition?.text ? (
+                  <div className="text-sm" style={{ textAlign: "justify" }}>
+                    {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
+                      <p key={index} className="mb-1">🍽️ {item}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <Skeleton className="w-full h-16 rounded" />
+                )}
+              </CardContent>
+            </Card>
           </div>
-        ) : (
-          <Skeleton className="w-full h-16 rounded" />
-        )}
-      </CardContent>
-    </Card>
-  </div>
 
-  {/* Right Column: 5-Day Forecast */}
-  <div className="flex-1">
-    <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105 h-full">
-      <CardContent>
-        <h3 className="text-lg font-semibold mb-2">5-Day Forecast</h3>
-        <AnimatePresence mode="wait">
-          {weather?.forecast?.forecastday ? (
-            <motion.div
-              key={weather.forecast.forecastday.map((day) => day.date).join(",")}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Table className="overflow-hidden text-sm">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Day</TableHead>
-                    <TableHead>Temp (°C)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {weather.forecast.forecastday.map((day) => (
-                    <TableRow key={day.date}>
-                      <TableCell>
-                        {new Date(day.date).toLocaleDateString("en-US", {
-                          weekday: "long",
-                        })}
-                      </TableCell>
-                      <TableCell className="flex items-center space-x-2">
-                        <div className="flex items-center justify-center w-6 h-6">
-                          {getWeatherIcon(day.day.condition.text)}
-                        </div>
-                        <span>
-                          {Math.round(convertTemperature(day.day.avgtemp_c))}°
-                          {temperatureUnit}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </motion.div>
-          ) : (
-            <div className="space-y-2">
-              <Skeleton className="w-full h-6 rounded" />
-              <Skeleton className="w-full h-6 rounded" />
-              <Skeleton className="w-full h-6 rounded" />
-            </div>
-          )}
-        </AnimatePresence>
-      </CardContent>
-    </Card>
-  </div>
-</div>
+          <div className="flex-1">
+            <Card className="p-3 bg-zinc-950 text-zinc-100 transition-transform duration-300 hover:scale-105 h-full">
+              <CardContent>
+                <h3 className="text-lg font-semibold mb-2">5-Day Forecast</h3>
+                <AnimatePresence mode="wait">
+                  {weather?.forecast?.forecastday ? (
+                    <motion.div
+                      key={weather.forecast.forecastday.map((day) => day.date).join(",")}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Table className="overflow-hidden text-sm">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Day</TableHead>
+                            <TableHead>Temp (°C)</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {weather.forecast.forecastday.map((day) => (
+                            <TableRow key={day.date}>
+                              <TableCell>
+                                {new Date(day.date).toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                })}
+                              </TableCell>
+                              <TableCell className="flex items-center space-x-2">
+                                <div className="flex items-center justify-center w-6 h-6">
+                                  {getWeatherIcon(day.day.condition.text)}
+                                </div>
+                                <span>
+                                  {Math.round(convertTemperature(day.day.avgtemp_c))}°
+                                  {temperatureUnit}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </motion.div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                    </div>
+                  )}
+                </AnimatePresence>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
         <div className="flex flex-row w-full mt-4" style={{ gap: "0.3rem" }}>
           <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left mr-4 h-[135px] transition-transform duration-30 hover:scale-110">
             <CardContent className="flex flex-row items-center justify-between">
