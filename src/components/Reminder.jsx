@@ -14,8 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
-import { Bell, Calendar as CalendarIcon } from "lucide-react";
+import { Bell } from "lucide-react";
 import Cookies from "js-cookie";
+import { Separator } from "@/components/ui/separator";
 
 const Reminder = ({ weather, fetchWeather }) => {
   const [showReminderDialog, setShowReminderDialog] = useState(false);
@@ -49,7 +50,7 @@ const Reminder = ({ weather, fetchWeather }) => {
         title: "Reminder Created!",
         description: "Your reminder has been successfully created.",
       });
-      setShowReminderDialog(false); // Close the dialog after saving
+      setShowReminderDialog(false);
     }
   };
 
@@ -123,9 +124,9 @@ const Reminder = ({ weather, fetchWeather }) => {
             <Bell className="w-4 h-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="flex items-center justify-between">
               Reminders
               {reminderDate && (
                 <Button
@@ -142,38 +143,53 @@ const Reminder = ({ weather, fetchWeather }) => {
               )}
             </DialogTitle>
           </DialogHeader>
-          <Calendar
-            mode="single"
-            selected={reminderDate}
-            onSelect={(date) => handleDateClick(date)}
-          />
-          {reminderDate && (
-            <div>
-              <h4 className="font-semibold mt-4">
-                Reminders for {reminderDate.toLocaleDateString()}
-              </h4>
-              {selectedDateReminders.length > 0 ? (
-                <ul>
-                  {selectedDateReminders.map((reminder, index) => (
-                    <li key={index}>
-                      {reminder.name} - {reminder.description}
-                    </li>
-                  ))}
-                </ul>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <Calendar
+                mode="single"
+                selected={reminderDate}
+                onSelect={(date) => handleDateClick(date)}
+              />
+            </div>
+            <Separator orientation="vertical" className="hidden sm:block" />
+            <div className="flex-1">
+              {reminderDate ? (
+                <div>
+                  <h4 className="font-semibold mb-2">
+                    Reminders for {reminderDate.toLocaleDateString()}
+                  </h4>
+                  {selectedDateReminders.length > 0 ? (
+                    <ul className="list-disc pl-4">
+                      {selectedDateReminders.map((reminder, index) => (
+                        <li key={index}>
+                          {reminder.name} - {reminder.description}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No reminders for this date.</p>
+                  )}
+                </div>
               ) : (
-                <p>No reminders for this date.</p>
+                <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+                  Select a date to view reminders.
+                </div>
               )}
             </div>
-          )}
+          </div>
           <div className="grid gap-4 py-4">
-            <Label htmlFor="name" className="text-right">Reminder Name</Label>
+            <Label htmlFor="name" className="text-left">
+              Reminder Name
+            </Label>
             <Input
               id="name"
               value={reminderName}
               onChange={(e) => setReminderName(e.target.value)}
               className="col-span-3"
             />
-            <Label htmlFor="description" className="text-right">Description</Label>
+            <Label htmlFor="description" className="text-left">
+              Description
+            </Label>
             <Textarea
               id="description"
               value={reminderDescription}
@@ -182,9 +198,6 @@ const Reminder = ({ weather, fetchWeather }) => {
             />
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowReminderDialog(false)}>
-              Close
-            </Button>
             <Button onClick={saveReminder}>
               Save Reminder
             </Button>
