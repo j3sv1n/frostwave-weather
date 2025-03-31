@@ -870,7 +870,7 @@ function App() {
               <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(138,43,226,0.3)_0%,_rgba(138,43,226,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
               {/* Card Content */}
-              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(127,159,212,0.5)] overflow-hidden">
+              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[145px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(127,159,212,0.5)] overflow-hidden">
                 <CardContent className="flex flex-row items-center justify-between">
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Humidity</h3>
@@ -901,7 +901,7 @@ function App() {
               <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,0,0,0.3)_0%,_rgba(255,0,0,0)_70%)] rounded-lg blur-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
               {/* Card Content */}
-              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[220px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,64,52,0.5)] overflow-hidden">
+              <Card className="flex-1 p-4 bg-zinc-950 text-zinc-100 text-left h-[145px] rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(235,64,52,0.5)] overflow-hidden">
                 <CardContent className="flex flex-row items-center justify-between">
                   <div>
                     <h3 className="text-xl font-semibold mb-2">UV Index</h3>
@@ -1025,8 +1025,8 @@ function App() {
     </div>
     <div style={{
       position: 'fixed',
-      bottom: '150px',
-      right: '70px',  
+      bottom: '120px',
+      right: '79px',  
       zIndex: 1000,     
     }}>
         <Reminder />
