@@ -25,6 +25,7 @@ const Reminder = ({ weather, fetchWeather }) => {
     const [reminderDescription, setReminderDescription] = useState("");
     const { toast } = useToast();
     const [selectedDateReminders, setSelectedDateReminders] = useState([]);
+    const [theme, setTheme] = useState("dark");
 
     const saveReminder = () => {
         if (reminderDate && reminderName && reminderDescription) {

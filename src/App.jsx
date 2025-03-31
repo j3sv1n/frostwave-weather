@@ -52,6 +52,8 @@ function App() {
   const [temperatureUnit, setTemperatureUnit] = useState("C");
   const [windSpeedUnit, setWindSpeedUnit] = useState("kph");
   const [theme, setTheme] = useState("dark");
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
+  const [isWeatherGlobeDrawerOpen, setIsWeatherGlobeDrawerOpen] = useState(false);
   
   
   useEffect(() => {
@@ -66,6 +68,11 @@ function App() {
         setFavorites([]);
       }
     }
+    const savedTheme = Cookies.get("theme"); 
+    if (savedTheme) {
+        setTheme(savedTheme);
+    }
+    setIsThemeLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -709,14 +716,17 @@ function App() {
                   <h2 className="text-2xl font-bold">Settings</h2>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium">Theme</span>
-                    <Switch
-                      checked={theme === "dark"}
-                      onCheckedChange={toggleTheme}
-                    />
-                    <span className={theme === "dark" ? "text-zinc-100" : "text-zinc-900"}>
-                      {theme === "dark" ? "Dark Mode" : "Light Mode"}
-                    </span>
+                    <span className="text-lg font-medium">Color Theme</span>
+                    <Tabs value={theme} onValueChange={toggleTheme}>
+                      <TabsList>
+                        <TabsTrigger value="light">
+                          <Sun className="w-5 h-5" />
+                        </TabsTrigger>
+                        <TabsTrigger value="dark">
+                          <Moon className="w-5 h-5" />
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                   </div>
                   
                   <div className="flex justify-between items-center">
@@ -1123,14 +1133,18 @@ function App() {
         </motion.div>
         </div>
     </div>
-    <div style={{
-      position: 'fixed',
-      bottom: '120px',
-      right: '79px',  
-      zIndex: 1000,     
-    }}>
-        <Reminder />
-    </div>
+    {
+      !isWeatherGlobeDrawerOpen && (
+        <div style={{
+          position: 'fixed',
+          bottom: '120px',
+          right: '79px',
+          zIndex: 1000,
+        }}>
+          <Reminder />
+        </div>
+      )
+    }
     <div style={{
       position: 'fixed',
       bottom: '50px',
