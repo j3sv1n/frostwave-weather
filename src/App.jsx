@@ -466,15 +466,6 @@ function App() {
             <h1 className={`text-3xl font-bold ${theme === "dark" ? "text-zinc-100" : "text-zinc-900"}`}>
               Frostwave
             </h1>
-            <div className="pt-2">
-              <Switch
-                checked={theme === "dark"}
-                onCheckedChange={toggleTheme}
-              />
-              <span className={theme === "dark" ? "text-zinc-100" : "text-zinc-900"}>
-                {theme === "dark" ? "Dark Mode" : "Light Mode"}
-              </span>
-            </div>
             <div className="flex items-center space-x-2 pt-1">
               <Switch
                 checked={musicType === "songs"}
@@ -668,6 +659,17 @@ function App() {
                         <TabsTrigger value="mph">mph</TabsTrigger>
                       </TabsList>
                     </Tabs>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium">Theme</span>
+                    <Switch
+                      checked={theme === "dark"}
+                      onCheckedChange={toggleTheme}
+                    />
+                    <span className={theme === "dark" ? "text-zinc-100" : "text-zinc-900"}>
+                      {theme === "dark" ? "Dark Mode" : "Light Mode"}
+                    </span>
                   </div>
                 </div>
               </SheetContent>
