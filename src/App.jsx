@@ -40,6 +40,7 @@ function App() {
   const [location, setLocation] = useState("");
   const [weather, setWeather] = useState(null);
   const [aiSummary, setAiSummary] = useState("");
+  const [foodRecommendations, setFoodRecommendations] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const inputRef = useRef(null);
@@ -87,64 +88,56 @@ function App() {
   const convertWindSpeed = (speedKph) => {
     return windSpeedUnit === "mph" ? speedKph * 0.621371 : speedKph;
   };
-  const getFoodRecommendations = (condition) => {
-    const lowerCondition = condition.toLowerCase();
-  
-    if (lowerCondition.includes("rain") || lowerCondition.includes("storm")) {
-      return [
-        "Warm chicken soup 🍜 to stay cozy.",
-        "Hot chocolate ☕ or herbal tea 🍵 to keep warm.",
-        "Stay hydrated with at least 2 liters of water 💧.",
-      ];
-    } else if (lowerCondition.includes("snow") || lowerCondition.includes("cold")) {
-      return [
-        "Steaming hot ramen 🍜 or noodle soup.",
-        "Spicy curries 🌶️ to warm yourself up.",
-        "Drink at least 2.5 liters of water 💧 to stay hydrated in the dry air.",
-      ];
-    } else if (lowerCondition.includes("sunny") || lowerCondition.includes("clear")) {
-      return [
-        "Cool off with a refreshing smoothie 🍹 or iced drink 🧊.",
-        "Enjoy a light salad 🥗 with seasonal fruits 🍓.",
-        "Drink at least 3 liters of water 💧 to stay hydrated in the heat.",
-      ];
-    } else if (lowerCondition.includes("cloudy") || lowerCondition.includes("overcast")) {
-      return [
-        "A warm cup of coffee ☕ or tea 🍵.",
-        "Freshly baked cookies 🍪 or a slice of pie 🥧.",
-        "Drink at least 2 liters of water 💧 to maintain hydration.",
-      ];
-    } else if (lowerCondition.includes("windy")) {
-      return [
-        "Hearty sandwiches 🥪 or wraps to enjoy on the go.",
-        "A thermos of hot soup 🍲 to keep warm.",
-        "Drink at least 2 liters of water 💧 to avoid dehydration.",
-      ];
-    } else if (lowerCondition.includes("humid")) {
-      return [
-        "Cold fruit juices 🍊 or coconut water 🥥 to stay refreshed.",
-        "Light meals like sushi 🍣 or fresh salads 🥗.",
-        "Drink at least 3 liters of water 💧 to stay cool.",
-      ];
-    } else if (lowerCondition.includes("fog") || lowerCondition.includes("mist")) {
-      return [
-        "Warm beverages like chai tea 🍵 or hot cocoa ☕.",
-        "Comfort foods like grilled cheese 🧀 and tomato soup 🍅.",
-        "Drink at least 2 liters of water 💧 to stay hydrated.",
-      ];
-    } else if (lowerCondition.includes("haze") || lowerCondition.includes("smoke")) {
-      return [
-        "Avoid heavy meals; opt for light snacks like crackers 🥨 or fruits 🍎.",
-        "Drink herbal teas 🍵 to soothe your throat.",
-        "Stay hydrated with at least 3 liters of water 💧 to combat dryness.",
-      ];
-    } else {
-      return [
-        "Enjoy your favorite comfort food 🍴!",
-        "Stay hydrated 🥤 with a drink of your choice.",
-      ];
+
+  const getFoodRecommendations = async (weatherData) => {
+    if (!weatherData || !weatherData.current) return;
+
+    const { condition } = weatherData.current;
+    const location = weatherData.location.name;
+
+    const prompt = `Recommend 3 foods or drinks based on the following weather and location. 
+    Do not mention the current temperature. 
+    Limit the response to a maximum of 50 words.
+    Location: ${location}
+    Condition: ${condition.text}
+    `;
+
+    try {
+      const response = await axios.post(
+        GEMINI_URL,
+        {
+          contents: [{ parts: [{ text: prompt }] }],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": GEMINI_API_KEY,
+          },
+        }
+      );
+
+      if (
+        response.data &&
+        response.data.candidates &&
+        response.data.candidates[0] &&
+        response.data.candidates[0].content &&
+        response.data.candidates[0].content.parts &&
+        response.data.candidates[0].content.parts[0].text
+      ) {
+        // Parse the AI response and set food recommendations
+        const aiResponse = response.data.candidates[0].content.parts[0].text;
+        // Simple parsing - adjust as needed for your AI's response format
+        const recommendations = aiResponse.split("\n").filter(item => item.trim() !== "").map(item => item.replace(/^\d+\.\s*/, '🍽️ '));
+        setFoodRecommendations(recommendations);
+      } else {
+        setFoodRecommendations(["Could not generate food recommendations."]);
+      }
+    } catch (error) {
+      console.error("Error fetching AI food recommendations:", error);
+      setFoodRecommendations(["Could not generate food recommendations."]);
     }
   };
+
   const addEmojisToSummary = (text) => {
     const lowerText = text.toLowerCase();
   
@@ -354,7 +347,8 @@ function App() {
       console.log("Weather data fetched successfully:", response.data); 
       setWeather(response.data); 
       setCurrentLocation(loc); 
-      fetchAiSummary(response.data); 
+      fetchAiSummary(response.data);
+      getFoodRecommendations(response.data);
       fetchMusic(response.data.current.condition.text); 
     } catch (error) {
       console.error("Error fetching weather:", error); 
@@ -774,12 +768,12 @@ function App() {
               <Card className="relative p-3 bg-zinc-950 text-zinc-100 rounded-lg shadow-md hover:shadow-[0_0_20px_5px_rgba(66,135,245,0.5)] overflow-hidden h-[180px]">
                 <div className="relative z-10 p-3 pb-5">
                   <CardContent>
-                    <h3 className="text-sm font-semibold mb-1">🍴 Food Recommendations</h3>
-                    {weather?.current?.condition?.text ? (
-                      <div className="text-xs space-y-1" style={{ textAlign: "justify" }}>
-                        {getFoodRecommendations(weather.current.condition.text).map((item, index) => (
+                    <h3 className="text-lg font-semibold mb-1">🍴 Food Recommendations</h3>
+                    {foodRecommendations.length > 0 ? (
+                      <div className="text-sm space-y-1" style={{ textAlign: "justify" }}>
+                        {foodRecommendations.map((item, index) => (
                           <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100 text-sm">
-                            🍽️ {item}
+                            {item}
                           </p>
                         ))}
                       </div>
