@@ -124,7 +124,9 @@ const Reminder = ({ weather, fetchWeather }) => {
             <Bell className="w-4 h-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[500px]">
+          {" "}
+          {/* Reduced max-width */}
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               Reminders
@@ -133,6 +135,7 @@ const Reminder = ({ weather, fetchWeather }) => {
                   variant="ghost"
                   size="sm"
                   className="ml-2"
+                  style={{ marginTop: '-19px', marginRight: '15px' }}
                   onClick={() => {
                     setSelectedDateReminders([]);
                     setReminderDate(null);
@@ -143,7 +146,9 @@ const Reminder = ({ weather, fetchWeather }) => {
               )}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
+            {" "}
+            {/* Reduced gap */}
             <div className="flex-1">
               <Calendar
                 mode="single"
@@ -155,7 +160,9 @@ const Reminder = ({ weather, fetchWeather }) => {
             <div className="flex-1">
               {reminderDate ? (
                 <div>
-                  <h4 className="font-semibold mb-2">
+                  <h4 className="font-semibold mb-1">
+                    {" "}
+                    {/* Reduced margin */}
                     Reminders for {reminderDate.toLocaleDateString()}
                   </h4>
                   {selectedDateReminders.length > 0 ? (
@@ -177,7 +184,9 @@ const Reminder = ({ weather, fetchWeather }) => {
               )}
             </div>
           </div>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-2 py-2">
+            {" "}
+            {/* Reduced gap and padding */}
             <Label htmlFor="name" className="text-left">
               Reminder Name
             </Label>
@@ -198,9 +207,7 @@ const Reminder = ({ weather, fetchWeather }) => {
             />
           </div>
           <DialogFooter>
-            <Button onClick={saveReminder}>
-              Save Reminder
-            </Button>
+            <Button onClick={saveReminder}>Save Reminder</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
