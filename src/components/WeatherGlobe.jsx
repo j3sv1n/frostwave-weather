@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import Globe from "react-globe.gl";
 import { Button } from "@/components/ui/button";
@@ -12,18 +12,19 @@ const WEATHER_URL = import.meta.env.VITE_WEATHER_URL;
 const WeatherGlobe = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hoverData, setHoverData] = useState(null);
-
-  const roundCoordinates = (lat, lng) => {
-    return {
-      lat: parseFloat(lat.toFixed(1)), // Round to 1 decimal place
-      lng: parseFloat(lng.toFixed(1)),
-    };
-  };
+  const globeRef = useRef(null);
 
   const handleGlobeClick = ({ lat, lng }) => {
     console.log("Clicked location:", lat, lng);
-    const { lat: roundedLat, lng: roundedLng } = roundCoordinates(lat, lng);
-    fetchWeather(`${roundedLat},${roundedLng}`);
+    const roundedLoc = `${lat.toFixed(1)},${lng.toFixed(1)}`;
+    fetchWeather(roundedLoc);
+    zoomToLocation(lat, lng);
+  };
+
+  const zoomToLocation = (lat, lng) => {
+    if (globeRef.current) {
+      globeRef.current.pointOfView({ lat, lng, altitude: 0.8 }, 1000);
+    }
   };
 
   const fetchWeather = async (loc) => {
@@ -33,7 +34,7 @@ const WeatherGlobe = () => {
         params: { key: API_KEY, q: loc, days: 3 },
       });
       console.log("Weather data fetched successfully:", response.data);
-      setHoverData({ temperature: response.data.current.temp_c });
+      setHoverData({ temperature: response.data.current.temp_c, lat: parseFloat(loc.split(",")[0]), lng: parseFloat(loc.split(",")[1]) });
     } catch (error) {
       console.error("Error fetching weather:", error);
     }
@@ -47,19 +48,27 @@ const WeatherGlobe = () => {
         </DrawerTrigger>
         <DrawerContent className="p-4 bg-black text-white">
           <Globe
+            ref={globeRef}
             globeImageUrl="/map1.jpg"
             backgroundColor="rgba(0,0,0,0)"
-            onGlobeClick={handleGlobeClick} // Capture clicks
+            onGlobeClick={handleGlobeClick}
           />
           {hoverData && (
-            <Popover>
-              <PopoverTrigger>
-                <div style={{ position: "absolute", top: "50%", left: "50%" }}>
-                  🔵
+            <Popover open>
+              <PopoverTrigger asChild>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: `${50 + hoverData.lat * 0.5}%`,
+                    left: `${50 + hoverData.lng * 0.5}%`,
+                    transform: "translate(-50%, -50%)"
+                  }}
+                >
+                  📍
                 </div>
               </PopoverTrigger>
               <PopoverContent>
-                Temperature: {hoverData.temperature}°C
+                {hoverData.temperature}°C
               </PopoverContent>
             </Popover>
           )}
