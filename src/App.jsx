@@ -838,7 +838,7 @@ function App() {
                     {foodRecommendations.length > 0 ? (
                       <div className="text-sm space-y-1" style={{ textAlign: "justify" }}>
                         {foodRecommendations.map((item, index) => (
-                          <p key={index} className="mb-1 p-1 rounded-lg text-zinc-100 text-sm">
+                          <p key={index} className='mb-1 p-1 rounded-lg ${theme === "dark" ? "text-zinc-100" : "text-zinc-900"} text-sm'>
                             {item}
                           </p>
                         ))}
