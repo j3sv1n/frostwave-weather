@@ -4,10 +4,10 @@ const LoadingScreen = () => {
     return (
         <div style={styles.loadingContainer}>
             <h1 style={styles.loadingText}>Frostwave</h1>
-            <div style={styles.dotsContainer}>
-                <span style={styles.dot}></span>
-                <span style={styles.dot}></span>
-                <span style={styles.dot}></span>
+            <div style={styles.iconsContainer}>
+                <span style={{ ...styles.icon, animationDelay: "0s" }}>☀️</span>
+                <span style={{ ...styles.icon, animationDelay: "0.5s" }}>🌧️</span>
+                <span style={{ ...styles.icon, animationDelay: "1s" }}>❄️</span>
             </div>
         </div>
     );
@@ -24,29 +24,27 @@ const styles = {
     },
     loadingText: {
         color: "#ffffff",
-        fontSize: "48px", // Increased font size drastically
+        fontSize: "48px",
         fontWeight: "bold",
-        marginBottom: "60px", // Increased spacing for better proportion
+        marginBottom: "20px", // Reduced spacing here for closer alignment with emojis
     },
-    dotsContainer: {
+    iconsContainer: {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gap: "30px", // Increased gap between dots
+        gap: "20px", // Adjusted gap between emojis for balanced spacing
     },
-    dot: {
-        width: "20px", // Larger dot size
-        height: "20px",
-        backgroundColor: "#FF0000",
-        borderRadius: "50%",
-        animation: "dotPulse 1.5s infinite ease-in-out",
+    icon: {
+        fontSize: "40px", // Emoji size
+        animation: "iconFade 1.5s infinite ease-in-out",
+        opacity: 0,
     },
 };
 
 // Adding the animation style as a global CSS
 const styleSheet = document.styleSheets[0];
 const keyframes = `
-@keyframes dotPulse {
+@keyframes iconFade {
     0%, 80%, 100% {
         transform: scale(0);
         opacity: 0.3;
@@ -55,8 +53,7 @@ const keyframes = `
         transform: scale(1);
         opacity: 1;
     }
-}
-`;
+}`;
 styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
 
 export default LoadingScreen;
