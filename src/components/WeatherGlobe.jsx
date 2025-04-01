@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios";
 import Globe from "react-globe.gl";
 import {
@@ -12,11 +12,13 @@ import {
     PopoverContent,
 } from "@/components/ui/popover";
 import { Globe as GlobeIcon } from "lucide-react";
+import { ThemeContext } from '@/App'; 
 
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
 const WEATHER_URL = import.meta.env.VITE_WEATHER_URL;
 
 const WeatherGlobe = () => {
+    const { theme } = useContext(ThemeContext);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [hoverData, setHoverData] = useState(null);
     const [pinCoords, setPinCoords] = useState(null);
@@ -55,18 +57,22 @@ const WeatherGlobe = () => {
 
     useEffect(() => {
         if (globeRef.current && hoverData) {
-            //  Delay the coordinate calculation slightly
             setTimeout(() => {
-                //  Get screen coordinates
                 const { x, y } = globeRef.current.getScreenCoords(
                     hoverData.lat,
                     hoverData.lng
                 );
-                //  Update pin coordinates
                 setPinCoords({ x, y });
-            }, 50); //  Adjust delay as needed
+            }, 50);
         }
-    }, [globeRef, hoverData, globeRef.current?.pointOfView()]);  //  <- Add globeRef.current?.pointOfView() as a dependency
+    }, [globeRef, hoverData, globeRef.current?.pointOfView()]);
+
+    const globeImage = theme === "light" ? "/maplight-fww.png" : "/mapdark-fww.png";
+
+    const drawerContentClasses = `
+        max-h-[95vh] p-4
+        ${theme === "light" ? "bg-zinc-100" : "bg-zinc-950"}
+    `;
 
     return (
         <div>
@@ -82,7 +88,8 @@ const WeatherGlobe = () => {
                         <button
                             onClick={() => setDrawerOpen(true)}
                             style={{
-                                background: "rgba(220, 220, 220, 1)",
+                                // Dynamic background color with inverted zinc shades
+                                background: theme === "dark" ? "rgba(220, 220, 220, 1)" : "rgba(50, 50, 50, 1)", // Dark mode - light bg, Light mode - dark bg
                                 borderRadius: "50%",
                                 width: "50px",
                                 height: "50px",
@@ -95,24 +102,27 @@ const WeatherGlobe = () => {
                                 boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
                             }}
                         >
-                            <GlobeIcon stroke="black" />
+                            <GlobeIcon
+                                // Dynamic icon color with inverted zinc shades
+                                stroke={theme === "dark" ? "black" : "white"} // Dark mode - dark color, Light mode - light color
+                            />
                         </button>
                     )}
                 </DrawerTrigger>
-                <DrawerContent className="max-h-[95vh] p-4 bg-black text-white">
+                <DrawerContent className={drawerContentClasses}>  {/* Apply theme-dependent styles */}
                     <div className="absolute top-4 z-10" style={{ left: '17.5%' }}>
-                        <h1 className="text-2xl font-semibold text-zinc-100">Planet Earth</h1>
+                        <h1 className={`text-2xl font-semibold ${theme === "light" ? "text-zinc-900" : "text-zinc-100"}`}>Planet Earth</h1>
                         {globeRef.current ? (
-                            <p className="text-sm text-zinc-400">
+                            <p className={`text-sm ${theme === "light" ? "text-zinc-600" : "text-zinc-400"}`}>
                                 {globeRef.current.pointOfView().lat.toFixed(7)}, {globeRef.current.pointOfView().lng.toFixed(7)}
                             </p>
                         ) : (
-                            <p className="text-sm text-zinc-400">Sol III: Verdant Biosphere</p>
+                            <p className={`text-sm ${theme === "light" ? "text-zinc-600" : "text-zinc-400"}`}>Sol III: Verdant Biosphere</p>
                         )}
                     </div>
                     <Globe
                         ref={globeRef}
-                        globeImageUrl="/mapdark-fww.png"
+                        globeImageUrl={globeImage} 
                         backgroundColor="rgba(0,0,0,0)"
                         onGlobeClick={handleGlobeClick}
                     />

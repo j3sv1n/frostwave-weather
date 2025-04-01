@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, createContext, useContext } from "react";
 import { debounce } from "lodash";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -29,6 +29,11 @@ import { ChartContainer } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { WiSmoke } from "react-icons/wi";
 import { ToastProvider } from "@/components/ui/toast";
+
+export const ThemeContext = createContext({
+  theme: 'dark',
+  toggleTheme: () => {},
+});
 
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
@@ -121,7 +126,8 @@ function App() {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    }, [theme]);
+    Cookies.set("theme", theme, { expires: 365 });
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
@@ -549,6 +555,7 @@ function App() {
 
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
     <ToastProvider>
     {/* <div className="bg-[linear-gradient(45deg,_theme(colors.zinc.900)_0%,_theme(colors.zinc.950)_20%,_theme(colors.zinc.950)_40%,__theme(colors.zinc.800)_75%,__theme(colors.zinc.950)_100%)] min-h-screen mb-30"> */}
     <div className={`min-h-screen ${theme === "dark" ? "bg-zinc-950" : "bg-zinc-100"}`}>
@@ -939,6 +946,10 @@ function App() {
                       <Skeleton className="w-full h-6 rounded" />
                       <Skeleton className="w-full h-6 rounded" />
                       <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
+                      <Skeleton className="w-full h-6 rounded" />
                     </div>
                   )}
                 </AnimatePresence>
@@ -1176,6 +1187,7 @@ function App() {
     </div>
   </div>
   </ToastProvider>
+  </ThemeContext.Provider>
   );
 }
 
