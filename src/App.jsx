@@ -648,12 +648,12 @@ function App() {
                 {searchResults.length > 0 ? (
                   searchResults.map((result) => (
                     <div
-                      key={result.id}
-                      className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        fetchWeather(result.name);
-                      }}
+                        key={result.id}
+                        className={`flex items-center justify-between cursor-pointer p-3 rounded ${theme === "light" ? "hover:bg-zinc-200" : "hover:bg-zinc-800"}`}
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            fetchWeather(result.name);
+                        }}
                     >
                       <span>
                         {result.name}, {result.region}
@@ -690,7 +690,7 @@ function App() {
                     {favorites.map((fav, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between cursor-pointer p-3 hover:bg-zinc-800 rounded"
+                        className={'flex items-center justify-between cursor-pointer p-3 ${theme === "light" ? "hover:bg-zinc-200" : "hover:bg-zinc-800"} rounded'}
                         onMouseDown={(e) => {
                           e.preventDefault();
                           fetchWeather(fav);
@@ -715,7 +715,7 @@ function App() {
                 )}
 
                 <div
-                  className="cursor-pointer flex items-center p-3 hover:bg-zinc-800 rounded mt-2"
+                  className={'cursor-pointer flex items-center p-3 ${theme === "light" ? "hover:bg-zinc-200" : "hover:bg-zinc-800"} rounded mt-2'}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     console.log("Current Location button clicked");
