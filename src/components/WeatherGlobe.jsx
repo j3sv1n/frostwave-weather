@@ -17,14 +17,15 @@ import { ThemeContext } from '@/App';
 const API_KEY = import.meta.env.VITE_WEATHER_KEY;
 const WEATHER_URL = import.meta.env.VITE_WEATHER_URL;
 const STREET_VIEW_URL = "https://maps.googleapis.com/maps/api/streetview";
-const STREET_VIEW_SIZE = "400x300"; // Adjust size as needed
-const STREET_VIEW_KEY = import.meta.env.VITE_STREET_VIEW_KEY; // Ensure you have this in your .env file
+const STREET_VIEW_SIZE = "400x300";
+const STREET_VIEW_KEY = import.meta.env.VITE_STREET_VIEW_KEY;
 
 const WeatherGlobe = () => {
     const { theme } = useContext(ThemeContext);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [hoverData, setHoverData] = useState(null);
     const [pinCoords, setPinCoords] = useState(null);
+    const [popoverOpen, setPopoverOpen] = useState(false);
     const globeRef = useRef(null);
 
     const handleGlobeClick = ({ lat, lng }) => {
@@ -32,6 +33,7 @@ const WeatherGlobe = () => {
         const roundedLoc = `${lat.toFixed(1)},${lng.toFixed(1)}`;
         fetchWeather(roundedLoc);
         zoomToLocation(lat, lng);
+        setPopoverOpen(true);
     };
 
     const zoomToLocation = (lat, lng) => {
@@ -58,7 +60,7 @@ const WeatherGlobe = () => {
                 lat: latitude,
                 lng: longitude,
                 locationName: response.data?.location?.name,
-                streetViewImage: streetViewImage, // Added Street View image URL
+                streetViewImage: streetViewImage,
             });
         } catch (error) {
             console.error("Error fetching weather:", error);
@@ -76,7 +78,20 @@ const WeatherGlobe = () => {
                 setPinCoords({ x, y });
             }, 50);
         }
-    }, [globeRef, hoverData, globeRef.current?.pointOfView()]);
+    }, [hoverData]);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (globeRef.current && !globeRef.current.contains(event.target)) {
+                setPopoverOpen(false);
+            }
+        };
+
+        document.addEventListener("click", handleOutsideClick);
+        return () => {
+            document.removeEventListener("click", handleOutsideClick);
+        };
+    }, []);
 
     const globeImage = theme === "light" ? "/maplight-fww.png" : "/mapdark-fww.png";
 
@@ -87,13 +102,7 @@ const WeatherGlobe = () => {
 
     return (
         <div>
-            <Drawer
-                open={drawerOpen}
-                onOpenChange={(open) => {
-                    setDrawerOpen(open);
-                    setIsWeatherGlobeDrawerOpen(open);
-                }}
-            >
+            <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
                 <DrawerTrigger asChild>
                     {!drawerOpen && (
                         <button
@@ -112,9 +121,7 @@ const WeatherGlobe = () => {
                                 boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
                             }}
                         >
-                            <GlobeIcon
-                                stroke={theme === "dark" ? "black" : "white"}
-                            />
+                            <GlobeIcon stroke={theme === "dark" ? "black" : "white"} />
                         </button>
                     )}
                 </DrawerTrigger>
@@ -135,8 +142,8 @@ const WeatherGlobe = () => {
                         backgroundColor="rgba(0,0,0,0)"
                         onGlobeClick={handleGlobeClick}
                     />
-                    {hoverData && pinCoords && (
-                        <Popover open>
+                    {hoverData && pinCoords && popoverOpen && (
+                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                             <PopoverTrigger asChild>
                                 <div
                                     style={{
@@ -150,20 +157,18 @@ const WeatherGlobe = () => {
                                 </div>
                             </PopoverTrigger>
                             <PopoverContent className="w-[450px] h-auto flex flex-col items-center justify-center p-4 text-xl font-bold text-zinc-100 bg-zinc-900 rounded-lg shadow-lg">
-                            {hoverData.streetViewImage && (
-                                <img
-                                    src={decodeURIComponent(hoverData.streetViewImage)}
-                                    alt={`Street View of ${hoverData.locationName || 'selected location'}`}
-                                    className="w-full rounded-md mb-2"
-                                />
-                            )}
+                                {hoverData.streetViewImage && (
+                                    <img
+                                        src={decodeURIComponent(hoverData.streetViewImage)}
+                                        alt={`Street View of ${hoverData.locationName || 'selected location'}`}
+                                        className="w-full rounded-md mb-2"
+                                    />
+                                )}
                                 {hoverData.temperature && (
                                     <div className="text-center">
                                         <div>{hoverData.temperature}°C</div>
                                         {hoverData.locationName && (
-                                            <p className="text-sm font-normal mt-1">
-                                                {hoverData.locationName}
-                                            </p>
+                                            <p className="text-sm font-normal mt-1">{hoverData.locationName}</p>
                                         )}
                                     </div>
                                 )}
