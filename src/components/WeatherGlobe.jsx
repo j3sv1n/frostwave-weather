@@ -112,7 +112,7 @@ const WeatherGlobe = () => {
                     </div>
                     <Globe
                         ref={globeRef}
-                        globeImageUrl="/map2.png"
+                        globeImageUrl="/mapdark-fww.png"
                         backgroundColor="rgba(0,0,0,0)"
                         onGlobeClick={handleGlobeClick}
                     />
