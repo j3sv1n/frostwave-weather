@@ -429,30 +429,38 @@ function App() {
   console.log("Hourly Data:", hourlyData);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsGraphVisible(true);
-            observer.unobserve(entry.target); // Observe only once
-          }
-        });
-      },
-      {
-        threshold: 0.1, // Trigger when 10% of the element is visible
-      }
-    );
+    let observer;
 
-    if (graphRef.current) {
-      observer.observe(graphRef.current);
+    const setupObserver = () => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsGraphVisible(true);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+        }
+      );
+
+      if (graphRef.current) {
+        observer.observe(graphRef.current);
+      }
+    };
+
+    if (!isLoading && graphRef.current) {
+      setupObserver();
     }
 
     return () => {
-      if (graphRef.current) {
+      if (observer && graphRef.current) {
         observer.unobserve(graphRef.current);
       }
     };
-  }, []);
+  }, [isLoading]);
 
   const fetchAiSummary = async (weatherData) => {
     if (!weatherData || !weatherData.forecast || !weatherData.forecast.forecastday) return;
