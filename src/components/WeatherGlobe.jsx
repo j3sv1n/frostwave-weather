@@ -27,12 +27,21 @@ const WeatherGlobe = () => {
     const [pinCoords, setPinCoords] = useState(null);
     const globeRef = useRef(null);
 
-    const handleGlobeClick = ({ lat, lng }) => {
+    const handleGlobeClick = async ({ lat, lng }) => {
         console.log("Clicked location:", lat, lng);
-        const roundedLoc = `${lat.toFixed(1)},${lng.toFixed(1)}`;
-        fetchWeather(roundedLoc);
+    
+        const roundedLocForWeather = `${lat.toFixed(1)},${lng.toFixed(1)}`;
+    
+        // Preserve the existing location name from hoverData
+        setHoverData(prevData => ({
+            ...prevData,
+            lat,
+            lng,
+            streetViewImage: `${STREET_VIEW_URL}?size=${STREET_VIEW_SIZE}&location=${lat.toFixed(4)},${lng.toFixed(4)}&key=${STREET_VIEW_KEY}`,
+        }));
+    
         zoomToLocation(lat, lng);
-    };
+    };    
 
     const zoomToLocation = (lat, lng) => {
         if (globeRef.current) {
@@ -40,25 +49,25 @@ const WeatherGlobe = () => {
         }
     };
 
-    const fetchWeather = async (loc) => {
+    const fetchWeather = async (loc, displayName) => {
         console.log(`Fetching weather for location: ${loc}`);
         try {
             const response = await axios.get(WEATHER_URL, {
                 params: { key: API_KEY, q: loc, days: 3 },
             });
             console.log("Weather data fetched successfully:", response.data);
-
+    
             const latitude = parseFloat(loc.split(",")[0]);
             const longitude = parseFloat(loc.split(",")[1]);
-
+    
             const streetViewImage = `${STREET_VIEW_URL}?size=${STREET_VIEW_SIZE}&location=${latitude},${longitude}&key=${STREET_VIEW_KEY}`;
-
+    
             setHoverData({
                 temperature: response.data?.current?.temp_c,
                 lat: latitude,
                 lng: longitude,
                 locationName: response.data?.location?.name,
-                streetViewImage: streetViewImage, // Added Street View image URL
+                streetViewImage: streetViewImage,
             });
         } catch (error) {
             console.error("Error fetching weather:", error);
@@ -91,7 +100,9 @@ const WeatherGlobe = () => {
                 open={drawerOpen}
                 onOpenChange={(open) => {
                     setDrawerOpen(open);
-                    setIsWeatherGlobeDrawerOpen(open);
+                    if (typeof setIsWeatherGlobeDrawerOpen === 'function') {
+                        setIsWeatherGlobeDrawerOpen(open);
+                    }
                 }}
             >
                 <DrawerTrigger asChild>
@@ -150,23 +161,23 @@ const WeatherGlobe = () => {
                                 </div>
                             </PopoverTrigger>
                             <PopoverContent className="w-[450px] h-auto flex flex-col items-center justify-center p-4 text-xl font-bold text-zinc-100 bg-zinc-900 rounded-lg shadow-lg">
-                            {hoverData.streetViewImage && (
-                                <img
-                                    src={decodeURIComponent(hoverData.streetViewImage)}
-                                    alt={`Street View of ${hoverData.locationName || 'selected location'}`}
-                                    className="w-full rounded-md mb-2"
-                                />
-                            )}
-                                {hoverData.temperature && (
-                                    <div className="text-center">
-                                        <div>{hoverData.temperature}°C</div>
-                                        {hoverData.locationName && (
-                                            <p className="text-sm font-normal mt-1">
-                                                {hoverData.locationName}
-                                            </p>
-                                        )}
-                                    </div>
+                                {hoverData.streetViewImage && (
+                                    <img
+                                        src={decodeURIComponent(hoverData.streetViewImage)}
+                                        alt={`Street View of ${hoverData.locationName || 'selected location'}`}
+                                        className="w-full rounded-md mb-2"
+                                    />
                                 )}
+                                <div className="text-center">
+                                    {hoverData.temperature && (
+                                        <div>{hoverData.temperature}°C</div>
+                                    )}
+                                    {hoverData.locationName && (
+                                        <p className="text-sm font-normal mt-1">
+                                            {hoverData.locationName}
+                                        </p>
+                                    )}
+                                </div>
                             </PopoverContent>
                         </Popover>
                     )}
