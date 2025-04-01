@@ -125,8 +125,8 @@ function App() {
     const location = weatherData.location.name;
 
     const prompt = `Recommend 3 foods or drinks based on the following weather and location. 
-    Do not mention the current temperature. 
-    Limit the response to a maximum of 50 words.
+    Do not mention the current temperature. Recommend water intake and other stuff like calories.
+    Limit the response exactly 30 words.
     Location: ${location}
     Condition: ${condition.text}
     `;
@@ -196,7 +196,7 @@ function App() {
     switch (condition.toLowerCase()) {
       case "sunny":
       case "clear":
-        return <WiDaySunny size={192} color={iconColorColor} />;
+        return <WiDaySunny size={192} color={iconColor} />;
       case "cloudy":
       case "partly cloudy":
         return <WiCloud size={192} color={iconColor} />;
