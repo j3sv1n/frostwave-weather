@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Globe from "react-globe.gl";
 import {
@@ -19,6 +19,7 @@ const WEATHER_URL = import.meta.env.VITE_WEATHER_URL;
 const WeatherGlobe = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [hoverData, setHoverData] = useState(null);
+    const [pinCoords, setPinCoords] = useState(null);
     const globeRef = useRef(null);
 
     const handleGlobeClick = ({ lat, lng }) => {
@@ -51,6 +52,21 @@ const WeatherGlobe = () => {
             console.error("Error fetching weather:", error);
         }
     };
+
+    useEffect(() => {
+        if (globeRef.current && hoverData) {
+            //  Delay the coordinate calculation slightly
+            setTimeout(() => {
+                //  Get screen coordinates
+                const { x, y } = globeRef.current.getScreenCoords(
+                    hoverData.lat,
+                    hoverData.lng
+                );
+                //  Update pin coordinates
+                setPinCoords({ x, y });
+            }, 50); //  Adjust delay as needed
+        }
+    }, [globeRef, hoverData, globeRef.current?.pointOfView()]);  //  <- Add globeRef.current?.pointOfView() as a dependency
 
     return (
         <div>
@@ -100,14 +116,14 @@ const WeatherGlobe = () => {
                         backgroundColor="rgba(0,0,0,0)"
                         onGlobeClick={handleGlobeClick}
                     />
-                    {hoverData && (
+                    {hoverData && pinCoords && (
                         <Popover open>
                             <PopoverTrigger asChild>
                                 <div
                                     style={{
                                         position: "absolute",
-                                        top: `${50 + hoverData.lat * 0.5}%`,
-                                        left: `${50 + hoverData.lng * 0.5}%`,
+                                        top: `${pinCoords.y}px`,
+                                        left: `${pinCoords.x}px`,
                                         transform: "translate(-50%, -50%)",
                                     }}
                                 >
