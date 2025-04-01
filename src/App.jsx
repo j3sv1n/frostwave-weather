@@ -18,6 +18,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { GlowArea, Glow } from "@/components/Glow"
+import LoadingScreen from "@/components/LoadingScreen"
 import { Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Search, Navigation, Heart, Settings } from "lucide-react";
@@ -54,6 +55,7 @@ function App() {
   const [theme, setTheme] = useState("dark");
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [isWeatherGlobeDrawerOpen, setIsWeatherGlobeDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   
   useEffect(() => {
@@ -101,6 +103,13 @@ function App() {
     Cookies.set("temperatureUnit", temperatureUnit, { expires: 365 });
     Cookies.set("windSpeedUnit", windSpeedUnit, { expires: 365 });
   }, [temperatureUnit, windSpeedUnit]);
+
+  useEffect(() => {
+    // Simulate data loading
+    setTimeout(() => {
+        setIsLoading(false);
+    }, 3000); // Adjust as needed
+  }, []);
 
   const convertTemperature = (tempC) => {
     return temperatureUnit === "F" ? (tempC * 9) / 5 + 32 : tempC;
@@ -525,6 +534,10 @@ function App() {
     setLocation(query);
     debouncedFetchSearchResults(query);
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     //<div className="bg-[linear-gradient(45deg,_theme(colors.zinc.950)_0%,_theme(colors.zinc.800)_50%,__theme(colors.zinc.900)_75%,__theme(colors.zinc.950)_100%)] min-h-screen">
