@@ -479,8 +479,8 @@ function App() {
       .join("\n");
   
     const prompt = `Provide a concise summary of the current weather conditions in a friendly tone. 
-    Include the weather conditions, temperature, and any notable patterns. 
-    Ensure the summary is exactly 35 words long. Don't mention the place name or the temperature.
+    Include the weather conditions, temperature, and any notable patterns. Also mention best time to visit the place.
+    Ensure the summary is exactly 40 words long. Don't mention the place name or the temperature.
   
     Location: ${weatherData.location.name}
     Temperature: ${weatherData.current.temp_c}°C
